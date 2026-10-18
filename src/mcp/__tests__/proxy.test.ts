@@ -67,6 +67,29 @@ describe("MCPProxy", () => {
 
       expect(result.tools[0].name.length).toBeLessThanOrEqual(64);
     });
+
+    it("advertises the response schema so the model knows the return shape", async () => {
+      const specWithJson = createMockOpenApiSpec({
+        paths: {
+          "/test": {
+            get: {
+              operationId: "getTest",
+              responses: {
+                "200": {
+                  description: "Success",
+                  content: { "application/json": { schema: { type: "object" } } },
+                },
+              },
+            },
+          },
+        },
+      });
+      const testProxy = new MCPProxy("test-proxy", specWithJson);
+      const [listToolsHandler] = getHandlers(testProxy);
+      const result = await listToolsHandler();
+
+      expect(result.tools[0].outputSchema).toMatchObject({ type: "object" });
+    });
   });
 
   describe("callTool handler", () => {
@@ -94,6 +117,32 @@ describe("MCPProxy", () => {
       expect(result).toEqual({
         content: [{ type: "text", text: JSON.stringify({ message: "success" }) }],
       });
+    });
+
+    it("returns structuredContent for a tool that declares an output schema", async () => {
+      const specWithJson = createMockOpenApiSpec({
+        paths: {
+          "/test": {
+            get: {
+              operationId: "getTest",
+              responses: {
+                "200": {
+                  description: "Success",
+                  content: { "application/json": { schema: { type: "object" } } },
+                },
+              },
+            },
+          },
+        },
+      });
+      const testProxy = new MCPProxy("test-proxy", specWithJson);
+      (HttpClient.prototype.executeOperation as ReturnType<typeof vi.fn>).mockResolvedValue(mockSuccessResponse);
+
+      const [, callToolHandler] = getHandlers(testProxy);
+      const result = await callToolHandler({ params: { name: "API-getTest", arguments: {} } });
+
+      expect(result.structuredContent).toEqual({ message: "success" });
+      expect(result.content[0].text).toBe(JSON.stringify({ message: "success" }));
     });
 
     it("should throw error for non-existent operation", async () => {

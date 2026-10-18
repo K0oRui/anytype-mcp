@@ -93,6 +93,11 @@ describe("tool exposure policy", () => {
     ]);
   });
 
+  it("excludes an operation the server documents as unimplemented", () => {
+    const spec = specFor({ operationId: "get_type_schema" });
+    expect(new OpenAPIToMCPConverter(spec).convertToMCPTools().tools.API.methods).toEqual([]);
+  });
+
   it.each([
     ["get_object", "get_object"],
     ["get_object", "get-object"],

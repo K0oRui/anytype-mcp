@@ -35,6 +35,9 @@ export class MCPProxy {
   // repair hints (see_also) in the tool vocabulary
   private operationIndex: OperationIndex;
   private components: OpenAPIV3.ComponentsObject | undefined;
+  // Tools that advertise an outputSchema. The protocol requires a result that
+  // conforms to a declared schema, so these also return structuredContent.
+  private toolsWithOutputSchema: Set<string>;
 
   constructor(name: string, openApiSpec: OpenAPIV3.Document) {
     this.server = new Server({ name, version: "1.0.0" }, { capabilities: { tools: {} } });
@@ -43,6 +46,14 @@ export class MCPProxy {
     const { tools, openApiLookup } = converter.convertToMCPTools();
     this.tools = tools;
     this.openApiLookup = openApiLookup;
+    this.toolsWithOutputSchema = new Set(
+      Object.entries(tools).flatMap(([toolName, def]) =>
+        def.methods
+          // the protocol only accepts an object output schema
+          .filter((method) => method.outputSchema?.type === "object")
+          .map((method) => `${toolName}-${method.name}`),
+      ),
+    );
     this.operationIndex = buildOperationIndex(openApiLookup, openApiSpec.components);
     this.components = openApiSpec.components;
     const baseUrl = determineBaseUrl(openApiSpec);
@@ -70,6 +81,9 @@ export class MCPProxy {
             name: toolNameWithMethod,
             description: method.description,
             inputSchema: method.inputSchema as Tool["inputSchema"],
+            ...(method.outputSchema?.type === "object"
+              ? { outputSchema: method.outputSchema as Tool["outputSchema"] }
+              : {}),
           });
         });
       });
@@ -99,20 +113,28 @@ export class MCPProxy {
           ...(response.headers.get("etag") ? { etag: response.headers.get("etag") } : {}),
           ...(response.requestKey ? { request_key: response.requestKey } : {}),
         };
+        const shaped = compactWriteResponse(
+          operation,
+          servesJsonEnvelope(operation, response.status, this.components)
+            ? respellResponse(response.data, this.operationIndex, operation.operationId)
+            : response.data,
+        );
+        // A declared outputSchema obliges the result to carry structured
+        // content that conforms to it. The generated schemas describe objects,
+        // so an object response is passed through as structuredContent; any
+        // other shape stays in the text block.
+        const structured =
+          this.toolsWithOutputSchema.has(name) && shaped !== null && typeof shaped === "object" && !Array.isArray(shaped)
+            ? (shaped as Record<string, unknown>)
+            : undefined;
         return {
+          ...(structured ? { structuredContent: structured } : {}),
           content: [
             {
               type: "text",
               // typed repair hints are re-spelled in the tool vocabulary
               // first; a download's body is content, not an envelope
-              text: JSON.stringify(
-                compactWriteResponse(
-                  operation,
-                  servesJsonEnvelope(operation, response.status, this.components)
-                    ? respellResponse(response.data, this.operationIndex, operation.operationId)
-                    : response.data,
-                ),
-              ),
+              text: JSON.stringify(shaped),
             },
             ...(Object.keys(metadata).length
               ? [{ type: "text", text: JSON.stringify({ request_metadata: metadata }) }]

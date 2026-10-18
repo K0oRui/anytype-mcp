@@ -3,6 +3,7 @@ import type { JSONSchema7 as IJsonSchema } from "json-schema";
 import type { ChatCompletionTool } from "openai/resources/chat/completions";
 import type { OpenAPIV3, OpenAPIV3_1 } from "openapi-types";
 import { OpVocabulary, respellOpIds, respellSchemaDescriptions } from "./op-vocabulary";
+import { getDescriptionOverride } from "./tool-descriptions";
 import { getOperationExclusion, getParameterPolicy, isFileDownload } from "./tool-policy";
 
 type NewToolMethod = {
@@ -591,10 +592,18 @@ export class OpenAPIToMCPConverter {
       parts.push(operation.description);
     }
     parts.push(flattenedBodyDescription);
-    let description = parts
+    const detailParts = parts
+      .slice(1)
+      .filter((part): part is string => typeof part === "string" && part.trim() !== "");
+    const generated = parts
       .filter((part): part is string => typeof part === "string" && part.trim() !== "")
       .map((part) => part.trim().replace(/\.$/, ""))
       .join(". ");
+    // The document leaves this route as a bare summary, so the model would
+    // read "List objects" and learn nothing. A curated line stands in; a route
+    // that already carries detail keeps it.
+    const override = detailParts.length ? undefined : getDescriptionOverride(operation.operationId);
+    let description = override ?? generated;
     if (isFileDownload({ ...operation, method })) {
       description += ". Saves locally and returns path, filename, media_type, and size in bytes.";
     }

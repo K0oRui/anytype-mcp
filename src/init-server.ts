@@ -2,6 +2,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import axios from "axios";
 import fs from "node:fs";
 import path from "node:path";
+import { setTimeout as sleep } from "node:timers/promises";
 import { URL } from "node:url";
 import { OpenAPIV3 } from "openapi-types";
 import { MCPProxy } from "./mcp/proxy";
@@ -40,7 +41,7 @@ async function withConnectRetry<T>(attempt: () => Promise<T>): Promise<T> {
         console.error("Anytype API not reachable yet; waiting for it to start...");
         notified = true;
       }
-      await new Promise((resolve) => setTimeout(resolve, delay));
+      await sleep(delay);
       delay = Math.min(delay * 2, CONNECT_RETRY_MAX_MS);
     }
   }

@@ -13,10 +13,11 @@ const v2 = JSON.parse(
 
 describe("fixed Anytype tool manifests", () => {
   it.each([
-    { version: "v1", spec: v1, count: 49, maxCharacters: 33500 },
+    { version: "v1", spec: v1, count: 49, maxCharacters: 34000 },
     // v2 tools carry each operation's description beside its summary (the
-    // server bounds those to 400 characters); the budget grew with them
-    { version: "v2", spec: v2, count: 46, maxCharacters: 27000 },
+    // server bounds those to 400 characters), and both versions add curated
+    // lines for routes the document leaves as a bare summary
+    { version: "v2", spec: v2, count: 45, maxCharacters: 28000 },
   ])("keeps the $version tool list compact and usable", ({ version, spec, count, maxCharacters }) => {
     const { tools, openApiLookup } = new OpenAPIToMCPConverter(spec as OpenAPIV3.Document).convertToMCPTools();
     const listed = tools.API.methods.map(({ name, description, inputSchema }) => ({
@@ -52,6 +53,15 @@ describe("fixed Anytype tool manifests", () => {
     expect(byName).not.toHaveProperty("API-stream-chat-messages");
     expect(byName).not.toHaveProperty("API-create-api-key");
     expect(byName).not.toHaveProperty("API-create-auth-challenge");
+    // A route that can only answer 501 must not be advertised
+    expect(byName).not.toHaveProperty("API-get-type-schema");
+    // A curated description stands in where the document gave only a summary
+    for (const tool of listed) {
+      expect(tool.description.trim().length).toBeGreaterThan(0);
+    }
+    expect(byName["API-list-objects"].description).toContain("fields");
+    expect(byName["API-list-properties"].description).toContain("properties in a space");
+    expect(byName["API-list-members"].description.length).toBeGreaterThan(20);
     if (version === "v2") {
       expect(byName).toHaveProperty("API-auth-whoami");
       expect(byName).toHaveProperty("API-get-op-schema");

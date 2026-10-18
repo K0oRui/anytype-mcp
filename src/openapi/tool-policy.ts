@@ -42,6 +42,13 @@ export function getParameterPolicy(parameter: OpenAPIV3.ParameterObject): Parame
 
 const credentialOperations = new Set(["create_auth_challenge", "create_api_key"]);
 
+/**
+ * Operations the server documents as unimplemented. Every request that reaches
+ * one answers 501, so listing it only invites a failing call. The per-type
+ * schema read is the only such route today.
+ */
+const unimplementedOperations = new Set(["get_type_schema"]);
+
 export function isFileDownload(operation: OpenAPIV3.OperationObject & { method?: string }): boolean {
   return operation.operationId === "download_file" && operation.method?.toLowerCase() === "get";
 }
@@ -52,6 +59,9 @@ export function getOperationExclusion(
   path: string,
   responses: OpenAPIV3.ResponseObject[],
 ): string | undefined {
+  if (unimplementedOperations.has(operation.operationId || "")) {
+    return "Operation is not implemented by the server";
+  }
   if (credentialOperations.has(operation.operationId || "") || /\/auth\/(api_keys|challenges)(?:\/|$)/.test(path)) {
     return "Pairing and credential management belong to the host configuration";
   }
