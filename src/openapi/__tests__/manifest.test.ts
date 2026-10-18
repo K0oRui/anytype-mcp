@@ -17,7 +17,7 @@ describe("fixed Anytype tool manifests", () => {
     // v2 tools carry each operation's description beside its summary (the
     // server bounds those to 400 characters), and both versions add curated
     // lines for routes the document leaves as a bare summary
-    { version: "v2", spec: v2, count: 45, maxCharacters: 28000 },
+    { version: "v2", spec: v2, count: 52, maxCharacters: 58000 },
   ])("keeps the $version tool list compact and usable", ({ version, spec, count, maxCharacters }) => {
     const { tools, openApiLookup } = new OpenAPIToMCPConverter(spec as OpenAPIV3.Document).convertToMCPTools();
     const listed = tools.API.methods.map(({ name, description, inputSchema }) => ({
