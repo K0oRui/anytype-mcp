@@ -124,6 +124,7 @@ describe("loadOpenApiSpec", () => {
     });
 
     it.each(["ECONNREFUSED", "ETIMEDOUT"])("does not fall back on %s", async (code) => {
+      vi.stubEnv("ANYTYPE_MCP_CONNECT_TIMEOUT_MS", "0");
       const exit = vi.spyOn(process, "exit").mockImplementation((() => {}) as any);
       vi.mocked(axios.get).mockRejectedValueOnce({ code, message: "Network error" });
 
@@ -131,6 +132,27 @@ describe("loadOpenApiSpec", () => {
 
       expect(exit).toHaveBeenCalledWith(1);
       expect(axios.get).toHaveBeenCalledTimes(1);
+    });
+
+    it("retries a refused connection until the API answers", async () => {
+      vi.stubEnv("ANYTYPE_MCP_CONNECT_TIMEOUT_MS", "5000");
+      vi.mocked(axios.get)
+        .mockRejectedValueOnce({ code: "ECONNREFUSED", message: "Network error" })
+        .mockResolvedValueOnce({ data: validOpenApiSpec });
+
+      expect(await loadOpenApiSpec()).toEqual(validOpenApiSpec);
+      expect(axios.get).toHaveBeenCalledTimes(2);
+    });
+
+    it("gives up when a refused connection outlasts the retry window", async () => {
+      vi.stubEnv("ANYTYPE_MCP_CONNECT_TIMEOUT_MS", "1");
+      const exit = vi.spyOn(process, "exit").mockImplementation((() => {}) as any);
+      vi.mocked(axios.get).mockRejectedValue({ code: "ECONNREFUSED", message: "Network error" });
+
+      await loadOpenApiSpec();
+
+      expect(exit).toHaveBeenCalledWith(1);
+      expect(vi.mocked(axios.get).mock.calls.length).toBeGreaterThanOrEqual(1);
     });
 
     it("reports invalid v2 JSON without falling back", async () => {

@@ -14,6 +14,38 @@ export class ValidationError extends Error {
   }
 }
 
+// A connection-level failure means the local app is not listening yet, often
+// because it is still starting alongside the MCP process. Retry those; an
+// HTTP status (401, 404, 500) is a real answer and must fail immediately.
+const CONNECT_ERROR_CODES = new Set(["ECONNREFUSED", "ECONNRESET", "ETIMEDOUT", "ENOTFOUND", "EAI_AGAIN"]);
+const CONNECT_RETRY_BASE_MS = 250;
+const CONNECT_RETRY_MAX_MS = 2000;
+const DEFAULT_CONNECT_TIMEOUT_MS = 30_000;
+
+function connectTimeoutMs(): number {
+  const raw = Number(process.env.ANYTYPE_MCP_CONNECT_TIMEOUT_MS);
+  return Number.isFinite(raw) && raw >= 0 ? raw : DEFAULT_CONNECT_TIMEOUT_MS;
+}
+
+async function withConnectRetry<T>(attempt: () => Promise<T>): Promise<T> {
+  const deadline = Date.now() + connectTimeoutMs();
+  let delay = CONNECT_RETRY_BASE_MS;
+  let notified = false;
+  for (;;) {
+    try {
+      return await attempt();
+    } catch (error: any) {
+      if (!CONNECT_ERROR_CODES.has(error?.code) || Date.now() >= deadline) throw error;
+      if (!notified) {
+        console.error("Anytype API not reachable yet; waiting for it to start...");
+        notified = true;
+      }
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      delay = Math.min(delay * 2, CONNECT_RETRY_MAX_MS);
+    }
+  }
+}
+
 export async function loadOpenApiSpec(specPath?: string): Promise<OpenAPIV3.Document> {
   const fallbackSpec = specPath ? undefined : getDefaultSpecUrl();
   const finalSpec = specPath || new URL("/v2/docs/openapi.json", fallbackSpec).href;
@@ -21,7 +53,7 @@ export async function loadOpenApiSpec(specPath?: string): Promise<OpenAPIV3.Docu
 
   if (finalSpec.startsWith("http://") || finalSpec.startsWith("https://")) {
     try {
-      const response = await fetchSpec(finalSpec, fallbackSpec);
+      const response = await withConnectRetry(() => fetchSpec(finalSpec, fallbackSpec));
       rawSpec = typeof response.data === "string" ? response.data : JSON.stringify(response.data);
     } catch (error: any) {
       if (error.code === "ECONNREFUSED") {
