@@ -17,7 +17,7 @@ describe("fixed Anytype tool manifests", () => {
     // v2 tools carry each operation's description beside its summary (the
     // server bounds those to 400 characters), and both versions add curated
     // lines for routes the document leaves as a bare summary
-    { version: "v2", spec: v2, count: 52, maxCharacters: 58000 },
+    { version: "v2", spec: v2, count: 80, maxCharacters: 80000 },
   ])("keeps the $version tool list compact and usable", ({ version, spec, count, maxCharacters }) => {
     const { tools, openApiLookup } = new OpenAPIToMCPConverter(spec as OpenAPIV3.Document).convertToMCPTools();
     const listed = tools.API.methods.map(({ name, description, inputSchema }) => ({
@@ -71,6 +71,15 @@ describe("fixed Anytype tool manifests", () => {
       expect(byName["API-patch-object"].inputSchema.properties).toHaveProperty("expected_etag");
       expect(byName["API-create-space"].inputSchema.properties).toHaveProperty("request_key");
       expect(byName["API-list-objects"].inputSchema.properties).toHaveProperty("fields");
+      // Space administration: the invite/join surface takes its credential from
+      // the link, so view-invite wants the file key as an input.
+      expect(byName).toHaveProperty("API-create-invite");
+      expect(byName).toHaveProperty("API-view-invite");
+      expect(byName["API-view-invite"].inputSchema.properties).toHaveProperty("file_key");
+      expect(byName["API-create-invite"].inputSchema.properties).toHaveProperty("invite_type");
+      expect(byName["API-join-space"].inputSchema.properties).toHaveProperty("invite_file_key");
+      expect(byName["API-share-space"].inputSchema.properties).toHaveProperty("dry_run");
+      expect(byName["API-change-space-ownership"].inputSchema.properties).toHaveProperty("new_owner_identity");
     }
   });
 });

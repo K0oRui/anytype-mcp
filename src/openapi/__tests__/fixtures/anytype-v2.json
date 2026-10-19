@@ -55,6 +55,14 @@
           "message"
         ]
       },
+      "AcceptResponse": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
       "AddChatMessageRequest": {
         "properties": {
           "attachments": {
@@ -69,6 +77,45 @@
           },
           "text": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AddMembersRequest": {
+        "properties": {
+          "identities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          },
+          "permissions": {
+            "description": "Permissions is the role every identity is granted: \"viewer\" (default),\n\"editor\", \"admin\", or \"owner\".",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AddObjectResponse": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "object_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "AddObjectsRequest": {
+        "properties": {
+          "object_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
           }
         },
         "type": "object"
@@ -94,6 +141,30 @@
           },
           "source": {
             "description": "Who chose it: request when the create named it, type_default when the type's default_template did.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ApproveMemberRequest": {
+        "properties": {
+          "identity": {
+            "type": "string"
+          },
+          "permissions": {
+            "description": "Permissions defaults to \"viewer\".",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ChangeOwnershipRequest": {
+        "properties": {
+          "new_owner_identity": {
+            "type": "string"
+          },
+          "old_owner_permissions": {
+            "description": "OldOwnerPermissions is the role the previous owner keeps: \"viewer\"\n(default), \"editor\", \"admin\", or \"no_permissions\" to leave.",
             "type": "string"
           }
         },
@@ -131,6 +202,10 @@
           "blocks_text": {
             "type": "string"
           },
+          "deleted": {
+            "description": "A deleted discussion comment, kept so its replies keep their thread: author, at and reply_to stay, text is empty. It can't be edited, reacted to or replied to.",
+            "type": "boolean"
+          },
           "edited_at": {
             "type": "string"
           },
@@ -159,6 +234,10 @@
             "type": "object"
           },
           "reply_to": {
+            "type": "string"
+          },
+          "state_id": {
+            "description": "Chat state id stamped once, when the message was stored locally; ids sort in that order. The message stream sends it as the event id, so it is the checkpoint a client resumes from (Last-Event-ID). An edit does not restamp it.",
             "type": "string"
           },
           "text": {
@@ -196,7 +275,7 @@
             "type": "integer"
           },
           "message_count": {
-            "description": "Messages the chat holds now; a deleted message leaves it",
+            "description": "Live messages in the chat; a deleted one isn't counted, even a discussion comment that stays in messages as deleted",
             "type": "integer"
           },
           "messages": {
@@ -224,6 +303,9 @@
             "type": "string"
           }
         },
+        "required": [
+          "emoji"
+        ],
         "type": "object"
       },
       "ChatReactionResult": {
@@ -250,6 +332,11 @@
             "type": "string"
           },
           "scope": {
+            "enum": [
+              "messages",
+              "mentions",
+              "reactions"
+            ],
             "type": "string"
           },
           "up_to": {
@@ -288,8 +375,24 @@
           "id": {
             "type": "string"
           },
+          "is_main": {
+            "description": "True for the space's main chat (the space chat every member shares); false for every other chat and for every discussion.",
+            "type": "boolean"
+          },
+          "kind": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
+          },
+          "parent_id": {
+            "type": "string"
+          },
+          "unread_mentions": {
+            "type": "integer"
+          },
+          "unread_messages": {
+            "type": "integer"
           }
         },
         "type": "object"
@@ -329,6 +432,26 @@
         "properties": {
           "name": {
             "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "type": "object"
+      },
+      "CreateInviteRequest": {
+        "properties": {
+          "invite_type": {
+            "description": "InviteType is \"member\" (default), \"guest\", or \"anyone\".",
+            "type": "string"
+          },
+          "permissions": {
+            "description": "Permissions is the role the invite grants: \"viewer\" (default),\n\"editor\", \"admin\", or \"owner\".",
+            "type": "string"
+          },
+          "share_within_space": {
+            "description": "ShareWithinSpace stores the invite in the space, so every member can\nshare it. Otherwise only the owner can.",
+            "type": "boolean"
           }
         },
         "type": "object"
@@ -399,6 +522,9 @@
             "type": "string"
           }
         },
+        "required": [
+          "name"
+        ],
         "type": "object"
       },
       "CreatedOption": {
@@ -409,6 +535,44 @@
           "property": {
             "description": "property key",
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "CurrentWorkspace": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "space_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DeclineMemberRequest": {
+        "properties": {
+          "identity": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DeleteBackupRequest": {
+        "properties": {
+          "backup_path": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "DeleteSpaceResponse": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "timestamp": {
+            "type": "integer"
           }
         },
         "type": "object"
@@ -458,9 +622,13 @@
       "EditChatMessageRequest": {
         "properties": {
           "text": {
+            "description": "The new text, required so an omitted member cannot clear the message by accident; an empty string clears it on purpose.",
             "type": "string"
           }
         },
+        "required": [
+          "text"
+        ],
         "type": "object"
       },
       "EditResult": {
@@ -531,6 +699,25 @@
           "issues"
         ]
       },
+      "ExportSpaceRequest": {
+        "properties": {
+          "path": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ExportSpaceResponse": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "path": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "FileUploadResult": {
         "properties": {
           "dry_run": {
@@ -546,6 +733,90 @@
             "type": "string"
           },
           "size": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "GuestInvite": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "invite_cid": {
+            "type": "string"
+          },
+          "invite_file_key": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Invite": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "held_by_owner": {
+            "description": "HeldByOwner is set when the invite is kept in the owner's account:\nmembers see it with an empty cid and file key.",
+            "type": "boolean"
+          },
+          "invite_cid": {
+            "type": "string"
+          },
+          "invite_file_key": {
+            "type": "string"
+          },
+          "invite_type": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "InviteChange": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "permissions": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "InviteView": {
+        "properties": {
+          "creator_icon_cid": {
+            "type": "string"
+          },
+          "creator_name": {
+            "type": "string"
+          },
+          "invite_type": {
+            "type": "string"
+          },
+          "is_guest_invite": {
+            "type": "boolean"
+          },
+          "space_icon_cid": {
+            "type": "string"
+          },
+          "space_icon_option": {
+            "type": "integer"
+          },
+          "space_id": {
+            "type": "string"
+          },
+          "space_name": {
+            "type": "string"
+          },
+          "space_type": {
+            "type": "string"
+          },
+          "space_ux_type": {
             "type": "integer"
           }
         },
@@ -575,6 +846,32 @@
         "required": [
           "message"
         ]
+      },
+      "JoinSpaceRequest": {
+        "properties": {
+          "invite_file_key": {
+            "type": "string"
+          },
+          "network_id": {
+            "type": "string"
+          },
+          "space_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LeaveApproveRequest": {
+        "properties": {
+          "identities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
       },
       "ListResponse-ChatRow": {
         "properties": {
@@ -928,6 +1225,17 @@
           "has_not_granted_spaces"
         ]
       },
+      "MemberPermissionChange": {
+        "properties": {
+          "identity": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "MemberRow": {
         "properties": {
           "icon_image": {
@@ -951,6 +1259,10 @@
       },
       "ObjectRow": {
         "properties": {
+          "discussion": {
+            "description": "Search rows only: the object's discussion (comment thread) chat id, when it has one. Read and post through the chat routes with it as chat_id.",
+            "type": "string"
+          },
           "id": {
             "type": "string"
           },
@@ -966,6 +1278,21 @@
           },
           "type": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "ObjectsMutationResponse": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "object_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
           }
         },
         "type": "object"
@@ -1014,6 +1341,18 @@
             },
             "description": "Query parameters to send with the operation, spelled in the hint as ?name=value pairs joined by & and sorted by name, values verbatim.",
             "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "RemoveMembersRequest": {
+        "properties": {
+          "identities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
           }
         },
         "type": "object"
@@ -1082,39 +1421,17 @@
         },
         "type": "object"
       },
-      "SearchRequestDoc": {
+      "SelectWorkspaceRequest": {
         "properties": {
-          "fields": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "uniqueItems": false
-          },
-          "filter": {
+          "space_id": {
             "type": "string"
-          },
-          "filters": {
-            "items": {
-              "additionalProperties": {},
-              "type": "object"
-            },
-            "type": "array",
-            "uniqueItems": false
-          },
-          "query": {
-            "description": "Full-text query over object names and indexed content.",
-            "type": "string"
-          },
-          "sorts": {
-            "items": {
-              "additionalProperties": {},
-              "type": "object"
-            },
-            "type": "array",
-            "uniqueItems": false
-          },
-          "type": {
+          }
+        },
+        "type": "object"
+      },
+      "SetHomepageRequest": {
+        "properties": {
+          "homepage": {
             "type": "string"
           }
         },
@@ -1156,6 +1473,36 @@
           },
           "name": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "SpaceOrder": {
+        "properties": {
+          "dry_run": {
+            "type": "boolean"
+          },
+          "space_view_order": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
+          }
+        },
+        "type": "object"
+      },
+      "SpaceOrderRequest": {
+        "properties": {
+          "space_view_id": {
+            "type": "string"
+          },
+          "space_view_order": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "uniqueItems": false
           }
         },
         "type": "object"
@@ -1217,6 +1564,26 @@
           },
           "name": {
             "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateInviteRequest": {
+        "properties": {
+          "permissions": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "UpdateMembersRequest": {
+        "properties": {
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/MemberPermissionChange"
+            },
+            "type": "array",
+            "uniqueItems": false
           }
         },
         "type": "object"
@@ -2110,7 +2477,7 @@
     "termsOfService": "https://anytype.io/terms_of_use",
     "title": "Anytype API v2",
     "version": "2025-11-08",
-    "description": "Anytype API v2 exposes an object as one editable **AnyBlock JSON document**.\nA single `GET` reads its properties and content; a single `PATCH` applies a\nbatch of edits. It is designed for agents, scripts, and integrations that\nneed to work with whole documents.\n\n> **Pre-release:** API v2 can change without a new API version. Use\n> [API v1](https://developers.anytype.io/docs/reference) for production\n> integrations that need a stable contract.\n\n## Connect and authenticate\n\nThe API runs locally with Anytype, at `http://127.0.0.1:31009` by default.\nBoth API majors share the same process, port, and API keys. v2 routes start\nwith `/v2/` and do not require the `Anytype-Version` request header.\n\nTo obtain a key through Desktop pairing:\n\n1. Send `POST /v2/auth/challenges` with an `app_name`.\n2. The user approves spaces and permissions in Anytype Desktop, then receives\n   a four-digit code.\n3. Send `POST /v2/auth/api_keys` with the `challenge_id` and `code`. The\n   response contains an `api_key` and the approved grant.\n\nThese two pairing endpoints require no existing key. For authenticated\nrequests, send the key in the `Authorization` header:\n\n```bash\ncurl http://127.0.0.1:31009/v2/auth/whoami \\\n  -H \"Authorization: Bearer $api_key\"\n```\n\nSet `api_key` to your key before running the example. The `whoami` response\ndescribes which spaces and permissions it grants.\n\nThe bearer credential is an opaque Anytype API key. It is not a JWT, and it\nis never read from a query or body parameter. An unknown, revoked, or expired\nkey returns `401`.\n\n## Objects, properties, and blocks\n\n- **Spaces** contain objects. Most routes are scoped to one space.\n- **Objects** combine typed `properties` with document content in `blocks`.\n- **Types** describe an object's shape and are addressed by a type key, such\n  as `page` or `task`.\n- **Queries** show a live selection of objects. **Collections** hold a\n  hand-curated list.\n- **Chats** store messages separately from document blocks. An object's\n  discussion, its comment thread, is a chat reached by the id an object read\n  serves as `discussion`.\n- **Widgets** are the sidebar: the objects a space pins for every member,\n  and the ones this account keeps for itself.\n\nBlocks form a flat array in document order, with `indent` describing the\nhierarchy. Inline text formatting uses Markdown. The title and description\nlive in the `name` and `description` properties.\n\n| Task | Request |\n| --- | --- |\n| Find available spaces | `GET /v2/spaces` |\n| Search within a space | `POST /v2/spaces/{space_id}/search` |\n| Search across spaces | `POST /v2/search` |\n| Read a document | `GET /v2/spaces/{space_id}/objects/{object_id}` |\n| Create an object | `POST /v2/spaces/{space_id}/objects` |\n| Edit a document | `PATCH /v2/spaces/{space_id}/objects/{object_id}` |\n| Pin an object to the sidebar | `POST /v2/spaces/{space_id}/widgets` |\n\n## Names and identifiers\n\nNames owned by v2 use `snake_case`: path and query parameters, request and\nresponse fields, and `PATCH` operation names. Content inside an AnyBlock\ndocument retains the format's own field vocabulary.\n\n### Property and type keys\n\nReads use stable keys such as `due_date` by default. A key is minted when\nthe property or type is created and stays the same after a rename. Use keys\nin scripts, configuration, and integrations.\n\nUse `?keys=name` to read display names such as `Due date` instead. This is\nuseful when showing users their own vocabulary.\n\nInputs accept keys, display names, and forgiving spelling variants. For\nexample, `due_date`, `dueDate`, `due-date`, and `Due date` can address the same\nproperty. An ambiguous spelling returns `400` with the candidates. An\nunknown spelling never creates a property implicitly.\n\nSelect options are addressed by their names. Object references remain full\nobject ids and are included inline.\n\n### Block and view ids\n\nDefault object reads shorten machine-minted block ids to document-local\nsuffixes. Use ids exactly as the read returns them when editing. Routes and\noperations that address a block or view accept a full id or a unique suffix;\nan ambiguous suffix is refused with a list of candidates.\n\nUse `?ids=full` for the export shape, with full ids throughout. This is the\nshape to store for a backup or use when cloning a document.\n\nPATCH receipts follow the same choice: `created_blocks` and `created_views`\nuse the labels from the resulting document by default, and full ids with\n`?ids=full`. This also applies to dry runs. Collision handling can leave an\nid full. An id removed by a later operation or omitted from the resulting\ndocument retains its minted spelling in the receipt.\n\n### Space references\n\nA space is normally served with a short reference: the last six characters\nof the first half of its full `<cid>.<replicationKey>` id. Space-scoped routes\naccept either spelling. Resolution tries an exact id first, then a unique\nsuffix among the spaces the key can access.\n\nAn ambiguous reference returns `400` with the candidates. Spaces whose\nsuffixes collide are served with full ids.\n\nA short reference is only unique among the spaces currently visible to the\nkey. Joining another space can make it ambiguous. Use `?ids=full` whenever a\nspace reference will be stored outside the API.\n\n## Read and search efficiently\n\nObject reads return the editable document by default. For a smaller read:\n\n- `?outline=true` returns the block structure with shortened text.\n- `?include=properties` or `?include=blocks` selects part of the object.\n- `?block={block_id}` returns one subtree, marked as a partial document.\n- `?format=md` returns a read-only Markdown rendering.\n\nPartial documents and Markdown renderings cannot be sent back as whole\ndocument writes. Use `PATCH` operations to edit the object.\n\nList and search rows are compact: `id`, `name`, `type`, and the properties\nyou request. They do not embed a type object. Request the fields you need\ninstead of reading every object separately.\n\nLists use `offset` and `limit`, with 25 rows by default. Responses include\n`total` and `has_more`, plus a narrowing hint when truncated. Chat messages\nuse an order-id cursor instead.\n\nSearch accepts full text in the JSON body's `query` field, for example\n`{\"query\":\"meeting notes\"}`. Cross-space search uses the currently loaded\nspaces. Its `total` is a lower bound when results are clipped; use `has_more`\nto continue paging. Warnings indicate when stores are still loading or\nunavailable, so retry later for a complete view.\n\n## Edit with a batch of operations\n\nSend an `ops` array to the object's `PATCH` endpoint. For example, this body\nchanges the title and appends a paragraph:\n\n```json\n{\n  \"ops\": [\n    {\n      \"op\": \"set_properties\",\n      \"set\": { \"name\": \"Meeting notes\" }\n    },\n    {\n      \"op\": \"insert_blocks\",\n      \"markdown\": \"Next step: review the proposal.\"\n    }\n  ]\n}\n```\n\nThe batch is atomic: an invalid operation rejects the whole request.\nDiscover the accepted fields for each operation at\n`GET /v2/schemas/ops/{op}`.\n\nAn object's type is part of the document envelope, not a property: change\nit with the `set_type` operation. Only layouts of one family convert, and\na refused change names the types the object can take instead.\n\n### Concurrency, retries, and dry runs\n\n| Control | Behavior |\n| --- | --- |\n| `ETag` / `If-Match` | Object reads return an `etag` in the body and an `ETag` header. Send it back in `If-Match` to check for concurrent changes. A stale value returns `409` with the current etag. Without the header, the last write wins. |\n| `Idempotency-Key` | Resource mutations replay the stored response when retried with the same key and request. `POST /v2/validate` also accepts a key. Search requests do not. |\n| `?dry_run=true` | Resource mutations validate the request and report the outcome without committing. A dry run returns `200` where the committed create would return `201`. Each operation documents any limits to its dry-run result. |\n\nChats use order ids and `last_state_id` for concurrency, and have no etag.\n\nResource bodies reject unknown fields with `400` and name the offending\nfield. Document bodies are capped at 10 MiB; structured bodies at 1 MiB.\n\nDeleting an object, type, or property archives it in Bin, where the Anytype\napp can restore it. Object deletion is limited by creator provenance; see\nthe [delete operation](https://developers.anytype.io/docs/reference/v2/delete-object)\nfor its requirements. Deleting a chat message, including any attachment\ncleanup that follows, is not an archive.\n\n## Errors and warnings\n\nErrors from v2 handlers have this structure:\n\n```json\n{\n  \"status\": 400,\n  \"code\": \"...\",\n  \"message\": \"...\",\n  \"issues\": [\n    { \"path\": \"...\", \"message\": \"...\", \"hint\": \"...\" }\n  ]\n}\n```\n\nAll four top-level fields are always present. `issues` is an empty array\nwhen there is no path to name. Issues identify the failing input and can\ndescribe the allowed values or how to repair the request.\n\nSome refusals occur before v2 handlers run:\n\n- Pairing, authentication, key-scope checks, request-origin checks, and the\n  shared write rate limit use the older shared error envelope.\n- An unmatched route or an unhandled panic returns no error envelope.\n\nA read does not fail because it encounters content its representation\ncannot express. Such content is reported in `warnings` beside the result.\n\n## Write chat messages\n\nMessage `text` is Markdown in both directions. Emphasis, code, links, and\n`<mention object_id=\"\u2026\">` tags become formatting. Escape a literal special\ncharacter with a backslash.\n\nA space chat stores each message as one formatted text, so it keeps only\nthe block syntax that text can show:\n\n- A `#` heading line becomes a bold line.\n- A fenced code block becomes code, and its language is dropped. Code over\n  several lines shows as a code block and reads back as a fence. A single\n  line shows as inline code.\n- Lists, quotes, and other block syntax stay literal.\n\nA discussion stores a message as blocks, so headings, list items,\ncheckboxes, quotes, and fenced code keep their style, with the code's\nlanguage. Other lines become one paragraph each, and a `---` line is a\ndivider. Nesting is flattened, and a table becomes one line per row with a\nwarning. A read returns the markdown that posts the same blocks.\n\nIn both kinds of chat, a read escapes text that would otherwise post as\nblock syntax, such as a literal `# ` at the start of a line. Posting a\nread's `text` unchanged keeps the message as it is.\n\n## Publish chat status\n\n`POST /v2/spaces/{space_id}/chats/{chat_id}/status` sends ephemeral activity\nfor a chat or discussion. For a typing indicator, send an empty body or `{}`.\nFor detailed agent activity, send:\n\n```json\n{\"text\":\"Searching documentation\",\"data\":{\"tool_call\":\"web_search\"}}\n```\n\n`text` is optional display text. Empty or omitted text stays omitted on the\nwire, allowing clients to show their localized typing label. `data` is optional\nand accepts any JSON value, including arrays, scalars, and null. The encoded\nJSON payload, including field names and escaping, must fit in 65,508 bytes.\n\nSuccess is `200 {}` and means the update was accepted for publication. The\nSpace's pubsub topic is `status/<chat_id>`; subscribers receive\n`Event.Pubsub.Message` with the verified sender identity. Status is neither\nstored as a chat message nor replayed by the chat-message stream.\n\nThis route requires write access. `?dry_run=true` validates without publishing;\n`Idempotency-Key` retries replay the response without publishing again. Use\na fresh key for each refresh, or omit it.\n\nRecommended client convention: refresh every two seconds while active and\nexpire the status ten seconds after its last receipt. Stop refreshing when\nfinished. Expiry is the receiving client's responsibility; empty text still\nmeans activity and does not clear it.\n\n## Stream chat messages\n\n`GET /v2/spaces/{space_id}/chats/{chat_id}/messages/stream` opens a\nServer-Sent Events connection. It starts with the last `limit` messages as\n`message_added` events, then delivers live changes:\n\n- `message_added`, `message_updated`, and `message_deleted`\n- `reactions_updated`, `state_updated`, and `pinned_updated`\n\nIdle connections stay open with comment lines that clients ignore.\n\nEach addition carries the chat state id as its event id. An id-only frame\nafter the opening window carries the highest such id. Send the last id back\nas `Last-Event-ID` to resume a dropped connection against the same node.\n\n**Only additions replay.** Edits, deletions, pins, and reactions do not\nchange that state id. Re-read messages to refresh changes made while the\nconnection was down.\n\nA `resync_required` event means the retained messages could not establish\ncoverage of the gap since your last event id. Content outside the following\nwindow is unverified. The absence of this event does not guarantee a\ncomplete history: out-of-order additions or reindexing can create gaps the\nstream cannot detect. Re-read messages when you need certainty.\n\n## Download files and icons\n\nUse `GET /v2/spaces/{space_id}/files/{file_id}/content` with a file id or the\n`icon_image` value from a space or member. The response contains bytes with\nthe matching `Content-Type`.\n\nDownloads support byte ranges and conditional requests with `ETag` or\n`Last-Modified`. File preconditions use standard status codes, including\n`304` and `412`. Access is checked on every request.\n\n## Discover schemas at runtime\n\n| Request | Result |\n| --- | --- |\n| `GET /v2/schemas` | Available schema kinds |\n| `GET /v2/schemas/{kind}` | The schema for one kind |\n| `GET /v2/schemas/ops/{op}` | The schema for one edit operation |\n\nThe schemas support strict constrained decoding. Read them before writing\nrequests, and use `POST /v2/validate` to check an AnyBlock document.\n"
+    "description": "Anytype API v2 exposes an object as one editable **AnyBlock JSON document**.\nA single `GET` reads its properties and content; a single `PATCH` applies a\nbatch of edits. It is designed for agents, scripts, and integrations that\nneed to work with whole documents.\n\n> **Pre-release:** API v2 can change without a new API version. Use\n> [API v1](https://developers.anytype.io/docs/reference) for production\n> integrations that need a stable contract.\n\n## Connect and authenticate\n\nThe API runs locally with Anytype, at `http://127.0.0.1:31009` by default.\nBoth API majors share the same process, port, and API keys. v2 routes start\nwith `/v2/` and do not require the `Anytype-Version` request header.\n\nTo obtain a key through Desktop pairing:\n\n1. Send `POST /v2/auth/challenges` with an `app_name`.\n2. The user approves spaces and permissions in Anytype Desktop, then receives\n   a four-digit code.\n3. Send `POST /v2/auth/api_keys` with the `challenge_id` and `code`. The\n   response contains an `api_key` and the approved grant.\n\nThese two pairing endpoints require no existing key. For authenticated\nrequests, send the key in the `Authorization` header:\n\n```bash\ncurl http://127.0.0.1:31009/v2/auth/whoami \\\n  -H \"Authorization: Bearer $api_key\"\n```\n\nSet `api_key` to your key before running the example. The `whoami` response\ndescribes which spaces and permissions it grants.\n\nThe bearer credential is an opaque Anytype API key. It is not a JWT, and it\nis never read from a query or body parameter. An unknown, revoked, or expired\nkey returns `401`.\n\n## Objects, properties, and blocks\n\n- **Spaces** contain objects. Most routes are scoped to one space.\n- **Objects** combine typed `properties` with document content in `blocks`.\n- **Types** describe an object's shape and are addressed by a type key, such\n  as `page` or `task`.\n- **Queries** show a live selection of objects. **Collections** hold a\n  hand-curated list.\n- **Chats** store messages separately from document blocks. An object's\n  discussion, its comment thread, is a chat reached by the id an object read\n  serves as `discussion`.\n- **Widgets** are the sidebar: the objects a space pins for every member,\n  and the ones this account keeps for itself.\n\nBlocks form a flat array in document order, with `indent` describing the\nhierarchy. Inline text formatting uses Markdown. The title and description\nlive in the `name` and `description` properties.\n\n| Task | Request |\n| --- | --- |\n| Find available spaces | `GET /v2/spaces` |\n| Search within a space | `POST /v2/spaces/{space_id}/search` |\n| Search across spaces | `POST /v2/search` |\n| Read a document | `GET /v2/spaces/{space_id}/objects/{object_id}` |\n| Create an object | `POST /v2/spaces/{space_id}/objects` |\n| Edit a document | `PATCH /v2/spaces/{space_id}/objects/{object_id}` |\n| Pin an object to the sidebar | `POST /v2/spaces/{space_id}/widgets` |\n\n## Names and identifiers\n\nNames owned by v2 use `snake_case`: path and query parameters, request and\nresponse fields, and `PATCH` operation names. Content inside an AnyBlock\ndocument retains the format's own field vocabulary.\n\n### Property and type keys\n\nReads use stable keys such as `due_date` by default. A key is minted when\nthe property or type is created and stays the same after a rename. Use keys\nin scripts, configuration, and integrations.\n\nUse `?keys=name` to read display names such as `Due date` instead. This is\nuseful when showing users their own vocabulary.\n\nInputs accept keys, display names, and forgiving spelling variants. For\nexample, `due_date`, `dueDate`, `due-date`, and `Due date` can address the same\nproperty. An ambiguous spelling returns `400` with the candidates. An\nunknown spelling never creates a property implicitly.\n\nSelect options are addressed by their names. Object references remain full\nobject ids and are included inline.\n\n### Block and view ids\n\nDefault object reads shorten machine-minted block ids to document-local\nsuffixes. Use ids exactly as the read returns them when editing. Routes and\noperations that address a block or view accept a full id or a unique suffix;\nan ambiguous suffix is refused with a list of candidates.\n\nUse `?ids=full` for the export shape, with full ids throughout. This is the\nshape to store for a backup or use when cloning a document.\n\nPATCH receipts follow the same choice: `created_blocks` and `created_views`\nuse the labels from the resulting document by default, and full ids with\n`?ids=full`. This also applies to dry runs. Collision handling can leave an\nid full. An id removed by a later operation or omitted from the resulting\ndocument retains its minted spelling in the receipt.\n\n### Space references\n\nA space is normally served with a short reference: the last six characters\nof the first half of its full `<cid>.<replicationKey>` id. Space-scoped routes\naccept either spelling. Resolution tries an exact id first, then a unique\nsuffix among the spaces the key can access.\n\nAn ambiguous reference returns `400` with the candidates. Spaces whose\nsuffixes collide are served with full ids.\n\nA short reference is only unique among the spaces currently visible to the\nkey. Joining another space can make it ambiguous. Use `?ids=full` whenever a\nspace reference will be stored outside the API.\n\n## Read and search efficiently\n\nObject reads return the editable document by default. For a smaller read:\n\n- `?outline=true` returns the block structure with shortened text.\n- `?include=properties` or `?include=blocks` selects part of the object.\n- `?block={block_id}` returns one subtree, marked as a partial document.\n- `?format=md` returns a read-only Markdown rendering.\n\nPartial documents and Markdown renderings cannot be sent back as whole\ndocument writes. Use `PATCH` operations to edit the object.\n\nList and search rows are compact: `id`, `name`, `type`, and the properties\nyou request. They do not embed a type object. Request the fields you need\ninstead of reading every object separately. A search row also carries\n`discussion`, the chat id of the object's comment thread, when it has one.\n\nLists use `offset` and `limit`, with 25 rows by default. Responses include\n`total` and `has_more`, plus a narrowing hint when truncated. Chat messages\nuse an order-id cursor instead.\n\nSearch accepts full text in the JSON body's `query` field, for example\n`{\"query\":\"meeting notes\"}`. Cross-space search uses the currently loaded\nspaces. Its `total` is a lower bound when results are clipped; use `has_more`\nto continue paging. Warnings indicate when stores are still loading or\nunavailable, so retry later for a complete view.\n\n## Edit with a batch of operations\n\nSend an `ops` array to the object's `PATCH` endpoint. For example, this body\nchanges the title and appends a paragraph:\n\n```json\n{\n  \"ops\": [\n    {\n      \"op\": \"set_properties\",\n      \"set\": { \"name\": \"Meeting notes\" }\n    },\n    {\n      \"op\": \"insert_blocks\",\n      \"markdown\": \"Next step: review the proposal.\"\n    }\n  ]\n}\n```\n\nThe batch is atomic: an invalid operation rejects the whole request.\nDiscover the accepted fields for each operation at\n`GET /v2/schemas/ops/{op}`.\n\nAn object's type is part of the document envelope, not a property: change\nit with the `set_type` operation. Only layouts of one family convert, and\na refused change names the types the object can take instead.\n\n### Concurrency, retries, and dry runs\n\n| Control | Behavior |\n| --- | --- |\n| `ETag` / `If-Match` | Object reads return an `etag` in the body and an `ETag` header. Send it back in `If-Match` to check for concurrent changes. A stale value returns `409` with the current etag. Without the header, the last write wins. |\n| `Idempotency-Key` | Resource mutations replay the stored response when retried with the same key and request. `POST /v2/validate` also accepts a key. Search requests do not. |\n| `?dry_run=true` | Resource mutations validate the request and report the outcome without committing. A dry run returns `200` where the committed create would return `201`. Each operation documents any limits to its dry-run result. |\n\nChats use order ids and `last_state_id` for concurrency, and have no etag.\n\nResource bodies reject unknown fields with `400` and name the offending\nfield. Document bodies are capped at 10 MiB; structured bodies at 1 MiB.\n\nDeleting an object, type, or property archives it in Bin, where the Anytype\napp can restore it. Object deletion is limited by creator provenance; see\nthe [delete operation](https://developers.anytype.io/docs/reference/v2/delete-object)\nfor its requirements. Deleting a chat message, including any attachment\ncleanup that follows, is not an archive.\n\n## Errors and warnings\n\nErrors from v2 handlers have this structure:\n\n```json\n{\n  \"status\": 400,\n  \"code\": \"...\",\n  \"message\": \"...\",\n  \"issues\": [\n    { \"path\": \"...\", \"message\": \"...\", \"hint\": \"...\" }\n  ]\n}\n```\n\nAll four top-level fields are always present. `issues` is an empty array\nwhen there is no path to name. Issues identify the failing input and can\ndescribe the allowed values or how to repair the request.\n\nSome refusals occur before v2 handlers run:\n\n- Pairing, authentication, key-scope checks, request-origin checks, and the\n  shared write rate limit use the older shared error envelope.\n- An unmatched route or an unhandled panic returns no error envelope.\n\nA read does not fail because it encounters content its representation\ncannot express. Such content is reported in `warnings` beside the result.\n\n## Write chat messages\n\nMessage `text` is Markdown in both directions. Emphasis, code, links, and\n`<mention object_id=\"\u2026\">` tags become formatting. Escape a literal special\ncharacter with a backslash.\n\nA space chat stores each message as one formatted text, so it keeps only\nthe block syntax that text can show:\n\n- A `#` heading line becomes a bold line.\n- A fenced code block becomes code, and its language is dropped. Code over\n  several lines shows as a code block and reads back as a fence. A single\n  line shows as inline code.\n- Lists, quotes, and other block syntax stay literal.\n\nA discussion stores a message as blocks, so headings, list items,\ncheckboxes, quotes, and fenced code keep their style, with the code's\nlanguage. Other lines become one paragraph each, and a `---` line is a\ndivider. Nesting is flattened, and a table becomes one line per row with a\nwarning. A read returns the markdown that posts the same blocks.\n\nIn both kinds of chat, a read escapes text that would otherwise post as\nblock syntax, such as a literal `# ` at the start of a line. Posting a\nread's `text` unchanged keeps the message as it is.\n\n## Publish chat status\n\n`POST /v2/spaces/{space_id}/chats/{chat_id}/status` sends ephemeral activity\nfor a chat or discussion. For a typing indicator, send an empty body or `{}`.\nFor detailed agent activity, send:\n\n```json\n{\"text\":\"Searching documentation\",\"data\":{\"tool_call\":\"web_search\"}}\n```\n\n`text` is optional display text. Empty or omitted text stays omitted on the\nwire, allowing clients to show their localized typing label. `data` is optional\nand accepts any JSON value, including arrays, scalars, and null. The encoded\nJSON payload, including field names and escaping, must fit in 65,508 bytes.\n\n`reply_to` is the optional id of the message the activity answers, up to 256\nbytes. In a discussion, clients show the activity in that message's thread; any\nmessage of the thread works, as for a reply. Without it, or when the client\ndoes not have that message, the activity shows at the discussion level. Send\nthe same `reply_to` you will give the reply. It is published as given, not\nchecked against the chat.\n\nSuccess is `200 {}` and means the update was accepted for publication. The\nSpace's pubsub topic is `status/<chat_id>`; subscribers receive\n`Event.Pubsub.Message` with the verified sender identity. Status is neither\nstored as a chat message nor replayed by the chat-message stream.\n\nThis route requires write access. `?dry_run=true` validates without publishing;\n`Idempotency-Key` retries replay the response without publishing again. Use\na fresh key for each refresh, or omit it.\n\nRecommended client convention: refresh every two seconds while active and\nexpire the status ten seconds after its last receipt. Stop refreshing when\nfinished. Expiry is the receiving client's responsibility; empty text still\nmeans activity and does not clear it.\n\n## Stream chat messages\n\n`GET /v2/spaces/{space_id}/chats/{chat_id}/messages/stream` opens a\nServer-Sent Events connection. It starts with the last `limit` messages as\n`message_added` events, then delivers live changes:\n\n- `message_added`, `message_updated`, and `message_deleted`\n- `reactions_updated`, `state_updated`, and `pinned_updated`\n\nIdle connections stay open with comment lines that clients ignore.\n\nEach addition carries the chat state id as its event id. An id-only frame\nafter the opening window carries the highest such id. Send the last id back\nas `Last-Event-ID` to resume a dropped connection against the same node.\n\n**Only additions replay.** Edits, deletions, pins, and reactions do not\nchange that state id. Re-read messages to refresh changes made while the\nconnection was down.\n\nA `resync_required` event means the retained messages could not establish\ncoverage of the gap since your last event id. Content outside the following\nwindow is unverified. The absence of this event does not guarantee a\ncomplete history: out-of-order additions or reindexing can create gaps the\nstream cannot detect. Re-read messages when you need certainty.\n\n## Watch every chat of a space\n\n`GET /v2/spaces/{space_id}/chats/stream` watches every chat and object\ndiscussion of a space over one Server-Sent Events connection. Pass\n`include=none` to leave discussions out.\n\nIt opens with one `chat_added` event per chat, carrying the chat list row plus\n`last_state_id`, then `snapshot_complete`. Live events follow:\n\n- `chat_added`, `chat_updated`, and `chat_removed` as chats appear, change\n  name or parent, and leave\n- `state_updated` when unread counters change\n- `message_added`, `message_updated`, `message_deleted`, `reactions_updated`,\n  and `pinned_updated` for every chat\n\nEvery event carries `space_id`, and every message event carries `chat_id`. A\nchat that appears after the opening is followed by its newest messages.\n\nEvents carry no id and nothing replays. Keep the `state_id` of the newest\nmessage you processed in each chat. After a reconnect, for each chat whose\n`last_state_id` is ahead of that checkpoint, open the chat's message stream\nonce with `Last-Event-ID` set to it. A message event can arrive twice, and\nrarely for a change that was rolled back: dedupe on the message id and confirm\nan unknown message with a read.\n\n## Watch a search\n\n`POST /v2/spaces/{space_id}/search/stream` holds a space search open over\nServer-Sent Events. The body is the search request without `query`, because\nfull text is not followed live. Nothing pages: the opening set is complete.\n\nIt opens with one `object_added` event per matching object, carrying its\nsearch row with the requested fields, then `snapshot_complete`, also for an\nempty set. The search's warnings ride `snapshot_complete`. Live events follow:\n\n- `object_added` when an object enters the set\n- `object_updated` with the whole row when a requested field, the name, the\n  type, or the object's discussion changes\n- `object_removed` with `object_id` when an object leaves the set, which does\n  not mean it was deleted\n\nEvery event carries `space_id`. Events carry no id and nothing replays. After\na reconnect the stream opens with a fresh snapshot, and an object you hold\nthat is absent from it has left the set.\n\n`unread_mention_count` and `unread_message_count` can be filtered, sorted, and\nrequested as fields, although the property list does not show them. They are\nthis account's unread counters: a chat keeps its own, and an object's\ndiscussion writes them onto the object, so an object that is neither a chat\nnor has a discussion has neither. For example,\n`{\"filter\":\"unread_mention_count > 0\",\"fields\":[\"name\",\"discussion\"]}` watches\nevery chat that mentions you and every object whose discussion does, and a hit\nleaves the set once you mark those mentions read.\n\n## Download files and icons\n\nUse `GET /v2/spaces/{space_id}/files/{file_id}/content` with a file id or the\n`icon_image` value from a space or member. The response contains bytes with\nthe matching `Content-Type`.\n\nDownloads support byte ranges and conditional requests with `ETag` or\n`Last-Modified`. File preconditions use standard status codes, including\n`304` and `412`. Access is checked on every request.\n\n## Discover schemas at runtime\n\n| Request | Result |\n| --- | --- |\n| `GET /v2/schemas` | Available schema kinds |\n| `GET /v2/schemas/{kind}` | The schema for one kind |\n| `GET /v2/schemas/ops/{op}` | The schema for one edit operation |\n\nThe schemas support strict constrained decoding. Read them before writing\nrequests, and use `POST /v2/validate` to check an AnyBlock document.\n"
   },
   "externalDocs": {
     "description": "OpenAPI",
@@ -2171,6 +2538,179 @@
         ]
       }
     },
+    "/v2/invites/{invite_cid}": {
+      "get": {
+        "description": "Folds the link open without joining. The cid and file key are the credential; no space grant is needed yet, which is why the caller must hold the whole link.",
+        "operationId": "view_invite",
+        "parameters": [
+          {
+            "description": "Invite cid, the part before the fragment",
+            "in": "path",
+            "name": "invite_cid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Invite file key, the fragment after the cid",
+            "in": "query",
+            "name": "file_key",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteView"
+                }
+              }
+            },
+            "description": "The space the invite opens"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Missing file key"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "The invite is unknown or revoked"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Preview an invite",
+        "tags": [
+          "Sharing"
+        ]
+      }
+    },
+    "/v2/invites/{invite_cid}/join": {
+      "post": {
+        "description": "The join is asynchronous: the answer says the request was accepted, and the space appears in GET /v2/spaces once the owner approves (or at once for an anyone invite). A dry run validates the body and stops there.",
+        "operationId": "join_space",
+        "parameters": [
+          {
+            "description": "Invite cid, the part before the fragment",
+            "in": "path",
+            "name": "invite_cid",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without joining",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JoinSpaceRequest"
+              }
+            }
+          },
+          "description": "The invite file key, and optionally the space and network ids",
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Join request accepted"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "The invite is unknown or revoked"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Join a space",
+        "tags": [
+          "Sharing"
+        ]
+      }
+    },
     "/v2/schemas": {
       "get": {
         "operationId": "list_schemas",
@@ -2212,7 +2752,7 @@
         "operationId": "get_op_schema",
         "parameters": [
           {
-            "description": "Op name: set_properties, update_block, replace_subtree, insert_blocks, move_block, delete_block, replace_text, set_cell, update_view, insert_view, move_view, delete_view, add_items, remove_items",
+            "description": "Op name: set_properties, set_type, update_block, replace_subtree, insert_blocks, move_block, delete_block, replace_text, set_cell, update_view, insert_view, move_view, delete_view, add_items, remove_items",
             "in": "path",
             "name": "op",
             "required": true,
@@ -2268,7 +2808,7 @@
         "operationId": "get_schema",
         "parameters": [
           {
-            "description": "Schema kind, as listed by list_schemas",
+            "description": "Schema kind, as listed by GET /v2/schemas",
             "in": "path",
             "name": "kind",
             "required": true,
@@ -2355,7 +2895,81 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SearchRequestDoc"
+                "additionalProperties": false,
+                "not": {
+                  "properties": {
+                    "filter": {
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "filter",
+                    "filters"
+                  ]
+                },
+                "properties": {
+                  "fields": {
+                    "description": "property keys to include per row, as an array such as [\"status\",\"due_date\"]; the list reads take the same array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "filter": {
+                    "description": "compact filter string (grammar on kind filters), an alternative to the structured filters array; a body sends at most one of the two",
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "filters": {
+                    "description": "structured filter nodes (schema kind filters), an alternative to the compact filter string; a body sends at most one of the two",
+                    "items": {
+                      "$ref": "#/components/schemas/FilterNode"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "query": {
+                    "description": "full-text query over object names and indexed content",
+                    "type": "string"
+                  },
+                  "sorts": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "direction": {
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ],
+                          "type": "string"
+                        },
+                        "empty_placement": {
+                          "enum": [
+                            "start",
+                            "end"
+                          ],
+                          "type": "string"
+                        },
+                        "property": {
+                          "maxLength": 256,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "property"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 10,
+                    "type": "array"
+                  },
+                  "type": {
+                    "description": "a type key: only objects of this type",
+                    "maxLength": 256,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               }
             }
           },
@@ -2563,12 +3177,89 @@
       }
     },
     "/v2/spaces/{space_id}": {
+      "delete": {
+        "description": "Irreversible. The space and its local data are removed for every member; the answer reports the deletion timestamp.",
+        "operationId": "delete_space",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate without deleting",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSpaceResponse"
+                }
+              }
+            },
+            "description": "Deleted, with the timestamp"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Delete a space",
+        "tags": [
+          "Sharing"
+        ]
+      },
       "get": {
         "description": "Only live spaces are served. A space that is deleted, left, or still joining is a 404.",
         "operationId": "get_space",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -2631,7 +3322,7 @@
         "operationId": "update_space",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -2735,14 +3426,30 @@
     },
     "/v2/spaces/{space_id}/chats": {
       "get": {
-        "description": "A row carries no unread counters. Per-chat unread state comes back with the messages read instead.",
+        "description": "Every row carries `unread_messages` and `unread_mentions`, read from the chat state without opening the chat. `include=discussions` adds the space's object discussions: a discussion row's id is the discussion's own id (usable on every chat route) and `parent_id` is the object it belongs to. `unread` keeps only rows with unread messages or unread mentions, and `total` then counts the kept rows.",
         "operationId": "list_chats",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "discussions adds object discussions to the list; omitted lists chats only",
+            "in": "query",
+            "name": "include",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "messages keeps rows with unread messages; mentions keeps rows with unread mentions",
+            "in": "query",
+            "name": "unread",
             "schema": {
               "type": "string"
             }
@@ -2777,6 +3484,16 @@
             },
             "description": "Chat rows"
           },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unknown include or unread value"
+          },
           "404": {
             "content": {
               "application/json": {
@@ -2786,9 +3503,6 @@
               }
             },
             "description": "Space not found"
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized"
@@ -2812,7 +3526,7 @@
         "operationId": "create_chat",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -2909,13 +3623,13 @@
         ]
       }
     },
-    "/v2/spaces/{space_id}/chats/{chat_id}/messages": {
+    "/v2/spaces/{space_id}/chats/stream": {
       "get": {
-        "description": "`after` alone walks forward, oldest first, continuing from `next_after`. Every other query is anchored at the newest end and walks backward from `next_before`. Both bounds are exclusive; messages are always ascending. `message_count` is the number of messages the chat holds now; `lifetime_message_count` counts every message ever posted. `offset` is refused.",
-        "operationId": "get_chat_messages",
+        "description": "Opens with a chat_added event per chat, then snapshot_complete, then live chat, state and message events for every chat. Events carry no id and there is no replay: keep the state_id of the newest message per chat and catch up a chat through its message stream with Last-Event-ID. A message event can arrive twice; dedupe on its id.",
+        "operationId": "stream_space_chats",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -2924,7 +3638,115 @@
             }
           },
           {
-            "description": "Chat object id",
+            "description": "discussions adds object discussions; none streams chats only",
+            "in": "query",
+            "name": "include",
+            "schema": {
+              "default": "discussions",
+              "enum": [
+                "discussions",
+                "none"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Keepalive cadence in seconds",
+            "in": "query",
+            "name": "heartbeat",
+            "schema": {
+              "default": 30,
+              "maximum": 60,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Server-Sent Events stream"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unknown include value"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found"
+          },
+          "429": {
+            "description": "Too many streams held at once; close one, retrying cannot succeed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "A chat of the space cannot be attached"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Stream a space's chats",
+        "tags": [
+          "Chat"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/chats/{chat_id}/messages": {
+      "get": {
+        "description": "`after` alone walks forward, oldest first, continuing from `next_after`. Every other query is anchored at the newest end and walks backward from `next_before`. Both bounds are exclusive; messages are always ascending. `message_count` counts the live messages (a deleted comment stays, as `deleted`); `lifetime_message_count` counts every message ever posted. `offset` is refused.",
+        "operationId": "get_chat_messages",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Chat object id, from GET /v2/spaces/{space_id}/chats",
             "in": "path",
             "name": "chat_id",
             "required": true,
@@ -3019,7 +3841,7 @@
         "operationId": "add_chat_message",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3028,7 +3850,7 @@
             }
           },
           {
-            "description": "Chat object id",
+            "description": "Chat object id, from GET /v2/spaces/{space_id}/chats",
             "in": "path",
             "name": "chat_id",
             "required": true,
@@ -3138,7 +3960,7 @@
         "operationId": "stream_chat_messages",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3147,7 +3969,7 @@
             }
           },
           {
-            "description": "Chat id",
+            "description": "Chat id, from GET /v2/spaces/{space_id}/chats",
             "in": "path",
             "name": "chat_id",
             "required": true,
@@ -3244,7 +4066,7 @@
         "operationId": "delete_chat_message",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3253,7 +4075,7 @@
             }
           },
           {
-            "description": "Chat object id",
+            "description": "Chat object id, from GET /v2/spaces/{space_id}/chats",
             "in": "path",
             "name": "chat_id",
             "required": true,
@@ -3262,7 +4084,7 @@
             }
           },
           {
-            "description": "Message id",
+            "description": "Message id, from GET /v2/spaces/{space_id}/chats/{chat_id}/messages",
             "in": "path",
             "name": "message_id",
             "required": true,
@@ -3339,7 +4161,7 @@
         "operationId": "edit_chat_message",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3348,7 +4170,7 @@
             }
           },
           {
-            "description": "Chat object id",
+            "description": "Chat object id, from GET /v2/spaces/{space_id}/chats",
             "in": "path",
             "name": "chat_id",
             "required": true,
@@ -3357,7 +4179,7 @@
             }
           },
           {
-            "description": "Message id",
+            "description": "Message id, from GET /v2/spaces/{space_id}/chats/{chat_id}/messages",
             "in": "path",
             "name": "message_id",
             "required": true,
@@ -3457,7 +4279,7 @@
         "operationId": "toggle_chat_reaction",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3466,7 +4288,7 @@
             }
           },
           {
-            "description": "Chat object id",
+            "description": "Chat object id, from GET /v2/spaces/{space_id}/chats",
             "in": "path",
             "name": "chat_id",
             "required": true,
@@ -3475,7 +4297,7 @@
             }
           },
           {
-            "description": "Message id",
+            "description": "Message id, from GET /v2/spaces/{space_id}/chats/{chat_id}/messages",
             "in": "path",
             "name": "message_id",
             "required": true,
@@ -3575,7 +4397,7 @@
         "operationId": "read_chat",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3584,7 +4406,7 @@
             }
           },
           {
-            "description": "Chat object id",
+            "description": "Chat object id, from GET /v2/spaces/{space_id}/chats",
             "in": "path",
             "name": "chat_id",
             "required": true,
@@ -3680,11 +4502,11 @@
     },
     "/v2/spaces/{space_id}/chats/{chat_id}/status": {
       "post": {
-        "description": "Publishes encrypted ephemeral JSON on status/<chat_id>. Empty text is omitted so clients can show localized typing. data accepts any JSON value. The encoded payload is limited to 65,508 bytes. Status is not stored or replayed; receivers expire it. Success acknowledges acceptance, not delivery.",
+        "description": "Publishes encrypted ephemeral JSON on status/<chat_id>. Empty text is omitted so clients can show localized typing. reply_to names the message it answers, for discussion threads. data accepts any JSON value. The encoded payload is limited to 65,508 bytes. Status is not stored or replayed; receivers expire it. Success acknowledges acceptance, not delivery.",
         "operationId": "publish_chat_status",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3693,7 +4515,7 @@
             }
           },
           {
-            "description": "Chat or discussion id",
+            "description": "Chat or discussion id, from GET /v2/spaces/{space_id}/chats",
             "in": "path",
             "name": "chat_id",
             "required": true,
@@ -3728,6 +4550,11 @@
                   "data": {
                     "description": "optional arbitrary JSON value: object, array, string, number, boolean or null"
                   },
+                  "reply_to": {
+                    "description": "optional id of the message the activity answers; in a discussion, clients show the activity in that message's thread, or at the discussion level when it is omitted. Not checked against the chat",
+                    "maxLength": 256,
+                    "type": "string"
+                  },
                   "text": {
                     "description": "optional display text; empty or omitted is left out of the pubsub payload so receivers can show a localized typing label; JSON escaping and data consume the same byte budget",
                     "maxLength": 65497,
@@ -3738,7 +4565,7 @@
               }
             }
           },
-          "description": "Optional text and arbitrary JSON data; clients localize the default typing label"
+          "description": "Optional text, reply_to and arbitrary JSON data; clients localize the default typing label"
         },
         "responses": {
           "200": {
@@ -3814,7 +4641,7 @@
         "operationId": "create_collection",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3928,7 +4755,7 @@
         "operationId": "get_collection_objects",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -3937,7 +4764,7 @@
             }
           },
           {
-            "description": "Collection object id",
+            "description": "Collection object id, from POST /v2/spaces/{space_id}/search",
             "in": "path",
             "name": "collection_id",
             "required": true,
@@ -3954,12 +4781,16 @@
             }
           },
           {
-            "description": "Comma-separated property keys to include per row",
+            "description": "Property keys to include per row, as an array of strings",
             "in": "query",
             "name": "fields",
             "schema": {
-              "type": "string"
-            }
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
           },
           {
             "description": "Items to skip",
@@ -4034,7 +4865,7 @@
         "operationId": "get_collection_views",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -4043,7 +4874,7 @@
             }
           },
           {
-            "description": "Collection object id",
+            "description": "Collection object id, from POST /v2/spaces/{space_id}/search",
             "in": "path",
             "name": "collection_id",
             "required": true,
@@ -4119,13 +4950,113 @@
         ]
       }
     },
+    "/v2/spaces/{space_id}/export": {
+      "post": {
+        "description": "Writes the space's objects to a directory on the middleware host. The export runs in the background; the answer reports the path. A dry run validates the body and stops there.",
+        "operationId": "export_space",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without exporting",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportSpaceRequest"
+              }
+            }
+          },
+          "description": "The destination directory",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportSpaceResponse"
+                }
+              }
+            },
+            "description": "The export destination"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Export a space",
+        "tags": [
+          "Sharing"
+        ]
+      }
+    },
     "/v2/spaces/{space_id}/files": {
       "post": {
         "description": "Send multipart/form-data with a `file` field, or JSON {\"url\": \u2026}. A source that refuses the fetch, or a URL that cannot be fetched, is a 400 naming /url; only a genuine server fault answers 500. The id that comes back is the one file blocks, image blocks and icon_image values reference.",
         "operationId": "upload_file",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -4249,7 +5180,7 @@
         "operationId": "download_file",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -4489,7 +5420,7 @@
         "operationId": "head_file",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -4626,12 +5557,688 @@
         ]
       }
     },
+    "/v2/spaces/{space_id}/homepage": {
+      "put": {
+        "description": "The homepage is the object (or widget) the space opens on. An empty homepage is a 400.",
+        "operationId": "set_space_homepage",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without committing",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetHomepageRequest"
+              }
+            }
+          },
+          "description": "The homepage object id",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Homepage set"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Set the space homepage",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/invite": {
+      "delete": {
+        "description": "The link stops working for everyone. Members already in the space are unaffected.",
+        "operationId": "revoke_invite",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate without revoking",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Invite revoked"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No invite, or the space is not live"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Revoke the invite",
+        "tags": [
+          "Sharing"
+        ]
+      },
+      "get": {
+        "description": "The owner-held invite is reported with held_by_owner and no cid or file key. A space with no invite is a 404.",
+        "operationId": "get_invite",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invite"
+                }
+              }
+            },
+            "description": "The current invite"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No invite, or the space is not live"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Get the space invite",
+        "tags": [
+          "Sharing"
+        ]
+      },
+      "patch": {
+        "description": "Only the role changes; the cid and file key stay the same, so a link already shared is not invalidated.",
+        "operationId": "update_invite",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate and report without committing",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInviteRequest"
+              }
+            }
+          },
+          "description": "The role to grant",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteChange"
+                }
+              }
+            },
+            "description": "The new role"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No invite, or the space is not live"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Change the invite role",
+        "tags": [
+          "Sharing"
+        ]
+      },
+      "post": {
+        "description": "A space has one invite link at a time; creating it replaces the role the old link grants. A dry run validates the body and stops there.",
+        "operationId": "create_invite",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without creating",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInviteRequest"
+              }
+            }
+          },
+          "description": "The invite to create",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invite"
+                }
+              }
+            },
+            "description": "Created invite"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Invite"
+                }
+              }
+            },
+            "description": "Dry run; validation result without committing"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Create the space invite",
+        "tags": [
+          "Sharing"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/invite/guest": {
+      "get": {
+        "description": "The guest link admits one person without an account on the network. A space with no guest invite is a 404.",
+        "operationId": "get_guest_invite",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuestInvite"
+                }
+              }
+            },
+            "description": "The guest invite"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No guest invite, or the space is not live"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Get the guest invite",
+        "tags": [
+          "Sharing"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/join/cancel": {
+      "post": {
+        "description": "Withdraws this account's join request for a space it has not been admitted to yet.",
+        "operationId": "cancel_join",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate without cancelling",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Join cancelled"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No pending join for this space"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Cancel a pending join",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/leave/approve": {
+      "post": {
+        "description": "The identities are removed from the space, as if they had left after the owner's approval.",
+        "operationId": "approve_leave",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without approving",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeaveApproveRequest"
+              }
+            }
+          },
+          "description": "The identities whose leave is approved",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Leave approved"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No pending leave for those identities"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Approve leave requests",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
     "/v2/spaces/{space_id}/members": {
       "get": {
         "operationId": "list_members",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -4698,6 +6305,402 @@
         "tags": [
           "Members"
         ]
+      },
+      "patch": {
+        "description": "One request carries every change; a role change for an identity not in the space is a 404.",
+        "operationId": "update_member_permissions",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without committing",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMembersRequest"
+              }
+            }
+          },
+          "description": "The role changes",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Roles changed"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space or member not found"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Change member roles",
+        "tags": [
+          "Members"
+        ]
+      },
+      "post": {
+        "description": "Mints or reuses the space invite at the given role; the caller then shares the link. An identity already in the space is not re-invited.",
+        "operationId": "add_members",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without inviting",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddMembersRequest"
+              }
+            }
+          },
+          "description": "The identities and the role",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Invites sent"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Invite members",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/members/approve": {
+      "post": {
+        "description": "The identity is admitted at the given role. A request that is not pending is a 404.",
+        "operationId": "approve_member",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without approving",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveMemberRequest"
+              }
+            }
+          },
+          "description": "The identity and the role to grant",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Request approved"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No pending request for that identity"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Approve a join request",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/members/decline": {
+      "post": {
+        "description": "The identity is told the request was declined and gains no access.",
+        "operationId": "decline_member",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without declining",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeclineMemberRequest"
+              }
+            }
+          },
+          "description": "The identity to decline",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Request declined"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No pending request for that identity"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Decline a join request",
+        "tags": [
+          "Members"
+        ]
       }
     },
     "/v2/spaces/{space_id}/members/me": {
@@ -4706,7 +6709,7 @@
         "operationId": "get_member_me",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -4757,12 +6760,13 @@
         ]
       }
     },
-    "/v2/spaces/{space_id}/objects": {
-      "get": {
-        "operationId": "list_objects",
+    "/v2/spaces/{space_id}/members/remove": {
+      "post": {
+        "description": "The identities lose access at once. Removing the owner is refused; transfer ownership first.",
+        "operationId": "remove_members",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -4771,12 +6775,115 @@
             }
           },
           {
-            "description": "Comma-separated property keys to include per row",
+            "description": "Validate the body without removing",
             "in": "query",
-            "name": "fields",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
             "schema": {
               "type": "string"
             }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveMembersRequest"
+              }
+            }
+          },
+          "description": "The identities to remove",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Members removed"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space or member not found"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Remove members",
+        "tags": [
+          "Members"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/objects": {
+      "get": {
+        "operationId": "list_objects",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Property keys to include per row, as an array of strings",
+            "in": "query",
+            "name": "fields",
+            "schema": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
           },
           {
             "description": "Items to skip",
@@ -4846,11 +6953,11 @@
         ]
       },
       "post": {
-        "description": "A select value naming an option the property does not hold is refused unless `create_missing_options=true` is set. An unknown type or property key is rejected either way. The body is a full AnyBlock document or the shortcut {type, name, properties, markdown}; `formatVersion` or `blocks` picks the document form. `template` starts the object from one; absent, the type's `default_template` applies.",
+        "description": "A select value naming an option the property does not hold is refused unless `create_missing_options=true` is set. An unknown type or property key is rejected. The body is a full AnyBlock document or the shortcut {type, name, properties, markdown}; a document-only member such as `blocks` picks the document. `template` starts the object from one; absent, the type's `default_template` applies.",
         "operationId": "create_object",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -4908,6 +7015,7 @@
                             "null"
                           ]
                         },
+                        "description": "property key \u2192 value. A list-shaped key takes an array of option names or object ids; a date takes a date string such as 2026-08-01 or 2026-08-01T09:30:00Z rather than unix seconds",
                         "maxProperties": 128,
                         "type": "object"
                       },
@@ -4928,11 +7036,44 @@
                     "type": "object"
                   },
                   {
-                    "description": "a full AnyBlock document: formatVersion 2.0, properties, and blocks in preorder. It takes the shortcut's template member too; its schema and a worked example come from get_schema with kind object",
+                    "additionalProperties": true,
+                    "description": "a full AnyBlock document: properties, and blocks in preorder. It takes the shortcut's template member too; its schema and a worked example come from GET /v2/schemas/object",
+                    "properties": {
+                      "blocks": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "collection_items": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "cover": {
+                        "type": "object"
+                      },
+                      "icon": {
+                        "type": "object"
+                      },
+                      "kind": {
+                        "enum": [
+                          "page",
+                          "template"
+                        ]
+                      },
+                      "properties": {
+                        "type": "object"
+                      },
+                      "query_source": {
+                        "type": "object"
+                      }
+                    },
                     "type": "object"
                   }
                 ],
-                "description": "the shortcut body, or a full AnyBlock document; formatVersion or blocks picks the document form"
+                "description": "the shortcut body, or a full AnyBlock document; a member only the document has, such as blocks, picks the document form"
               }
             }
           },
@@ -4997,13 +7138,13 @@
         ]
       }
     },
-    "/v2/spaces/{space_id}/objects/{object_id}": {
-      "delete": {
-        "description": "Only objects this key created can be deleted. The creator is recorded at creation time and never added later, so objects made in the app, imported, made by another member, or made before this route shipped are refused for good. System objects are a 403 as well. A dry run reports the verdict without the checks that run at archive time, so a deletable verdict can still meet a 403.",
-        "operationId": "delete_object",
+    "/v2/spaces/{space_id}/objects/add": {
+      "post": {
+        "description": "Adds existing objects to the space's object list in one call. Objects already in the list are left alone.",
+        "operationId": "add_objects_to_space",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5012,7 +7153,107 @@
             }
           },
           {
-            "description": "Object id",
+            "description": "Validate the body without linking",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddObjectsRequest"
+              }
+            }
+          },
+          "description": "The object ids to link",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectsMutationResponse"
+                }
+              }
+            },
+            "description": "The linked object ids"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Link objects into a space",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/objects/{object_id}": {
+      "delete": {
+        "description": "Only objects this key created can be deleted. The creator is recorded at creation time and never added later, so objects made in the app, imported, made by another member, or made before this route shipped are refused for good. System objects are a 403 as well. A dry run reports the verdict without the checks that run at archive time, so a deletable verdict can still meet a 403.",
+        "operationId": "delete_object",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Object id, from POST /v2/spaces/{space_id}/search or GET /v2/spaces/{space_id}/objects",
             "in": "path",
             "name": "object_id",
             "required": true,
@@ -5088,7 +7329,7 @@
         "operationId": "get_object",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5097,7 +7338,7 @@
             }
           },
           {
-            "description": "Object id",
+            "description": "Object id, from POST /v2/spaces/{space_id}/search or GET /v2/spaces/{space_id}/objects",
             "in": "path",
             "name": "object_id",
             "required": true,
@@ -5196,11 +7437,11 @@
         ]
       },
       "patch": {
-        "description": "Applies ops in order as one atomic edit. A failed op or invalid result leaves the object unchanged. Text locators must match exactly one block. New block and view IDs are returned by payload position in `created_blocks` and `created_views`, compact by default or full with `ids=full`.",
+        "description": "Edits in place, keeping the id and links; to change the type, use set_type rather than recreating the object. Applies ops in order as one atomic edit. A failed op or invalid result leaves the object unchanged. Text locators must match exactly one block. New block and view IDs are returned by payload position in `created_blocks` and `created_views`, compact by default or full with `ids=full`.",
         "operationId": "patch_object",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5209,7 +7450,7 @@
             }
           },
           {
-            "description": "Object id",
+            "description": "Object id, from POST /v2/spaces/{space_id}/search or GET /v2/spaces/{space_id}/objects",
             "in": "path",
             "name": "object_id",
             "required": true,
@@ -5262,7 +7503,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "ops": {
-                    "description": "applied in order as one edit, and if any one is refused none is applied. Each op's members, schema and example come from get_op_schema with its op name",
+                    "description": "applied in order as one edit, and if any one is refused none is applied. Each op's members, schema and example come from GET /v2/schemas/ops/{op} with its op name",
                     "items": {
                       "properties": {
                         "op": {
@@ -5371,13 +7612,13 @@
         ]
       }
     },
-    "/v2/spaces/{space_id}/objects/{object_id}/discussion": {
-      "post": {
-        "description": "A discussion is the comment thread under an object, and it is a chat: the returned id is the `chat_id` for every chat operation, where `reply_to` makes a threaded reply. An object that already has one answers 200 with the same id and no `created`, so the call is safe to repeat. An object read serves the id as `discussion`. Chats, types, templates and system objects cannot hold one.",
-        "operationId": "create_discussion",
+    "/v2/spaces/{space_id}/objects/{object_id}/add": {
+      "put": {
+        "description": "The idempotent single-object form of the batch route.",
+        "operationId": "add_object_to_space",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5386,7 +7627,95 @@
             }
           },
           {
-            "description": "Object id",
+            "description": "Object id to link",
+            "in": "path",
+            "name": "object_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate without linking",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddObjectResponse"
+                }
+              }
+            },
+            "description": "The linked object"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Link one object into a space",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/objects/{object_id}/discussion": {
+      "post": {
+        "description": "A discussion is the comment thread under an object, and it is a chat: the returned id is the `chat_id` for every chat operation, where `reply_to` makes a threaded reply. An object that already has one answers 200 with the same id and no `created`, so the call is safe to repeat. An object read serves the id as `discussion`. Chats, types, templates and system objects cannot hold one.",
+        "operationId": "create_discussion",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Object id, from POST /v2/spaces/{space_id}/search or GET /v2/spaces/{space_id}/objects",
             "in": "path",
             "name": "object_id",
             "required": true,
@@ -5476,12 +7805,112 @@
         ]
       }
     },
+    "/v2/spaces/{space_id}/ownership": {
+      "post": {
+        "description": "Irreversible. The new owner must already be a member. old_owner_permissions decides what the caller keeps, and no_permissions leaves the space.",
+        "operationId": "change_space_ownership",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate the body without transferring",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeOwnershipRequest"
+              }
+            }
+          },
+          "description": "The new owner and the caller's remaining role",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Ownership transferred"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space or identity not found"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Transfer ownership",
+        "tags": [
+          "Sharing"
+        ]
+      }
+    },
     "/v2/spaces/{space_id}/properties": {
       "get": {
         "operationId": "list_properties",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5554,7 +7983,7 @@
         "operationId": "create_property",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5703,7 +8132,7 @@
         "operationId": "delete_property",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5712,7 +8141,7 @@
             }
           },
           {
-            "description": "Property key",
+            "description": "Property key, from GET /v2/spaces/{space_id}/properties",
             "in": "path",
             "name": "key",
             "required": true,
@@ -5781,7 +8210,7 @@
         "operationId": "update_property",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5790,7 +8219,7 @@
             }
           },
           {
-            "description": "Property key",
+            "description": "Property key, from GET /v2/spaces/{space_id}/properties",
             "in": "path",
             "name": "key",
             "required": true,
@@ -5892,7 +8321,7 @@
         "operationId": "list_property_options",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -5901,7 +8330,7 @@
             }
           },
           {
-            "description": "Property key",
+            "description": "Property key, from GET /v2/spaces/{space_id}/properties",
             "in": "path",
             "name": "key",
             "required": true,
@@ -5984,7 +8413,7 @@
         "operationId": "create_query",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -6108,7 +8537,7 @@
                     "type": "array"
                   },
                   "type": {
-                    "description": "the queried type's key",
+                    "description": "the key of the one type the query covers",
                     "maxLength": 256,
                     "type": "string"
                   },
@@ -6386,7 +8815,7 @@
         "operationId": "get_query_objects",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -6395,7 +8824,7 @@
             }
           },
           {
-            "description": "Query object id",
+            "description": "Query object id, from POST /v2/spaces/{space_id}/search",
             "in": "path",
             "name": "query_id",
             "required": true,
@@ -6412,12 +8841,16 @@
             }
           },
           {
-            "description": "Comma-separated property keys to include per row",
+            "description": "Property keys to include per row, as an array of strings",
             "in": "query",
             "name": "fields",
             "schema": {
-              "type": "string"
-            }
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "style": "form"
           },
           {
             "description": "Items to skip",
@@ -6492,7 +8925,7 @@
         "operationId": "get_query_views",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -6501,7 +8934,7 @@
             }
           },
           {
-            "description": "Query object id",
+            "description": "Query object id, from POST /v2/spaces/{space_id}/search",
             "in": "path",
             "name": "query_id",
             "required": true,
@@ -6583,7 +9016,7 @@
         "operationId": "search_space",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -6614,7 +9047,81 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SearchRequestDoc"
+                "additionalProperties": false,
+                "not": {
+                  "properties": {
+                    "filter": {
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "filter",
+                    "filters"
+                  ]
+                },
+                "properties": {
+                  "fields": {
+                    "description": "property keys to include per row, as an array such as [\"status\",\"due_date\"]; the list reads take the same array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "filter": {
+                    "description": "compact filter string (grammar on kind filters), an alternative to the structured filters array; a body sends at most one of the two",
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "filters": {
+                    "description": "structured filter nodes (schema kind filters), an alternative to the compact filter string; a body sends at most one of the two",
+                    "items": {
+                      "$ref": "#/components/schemas/FilterNode"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "query": {
+                    "description": "full-text query over object names and indexed content",
+                    "type": "string"
+                  },
+                  "sorts": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "direction": {
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ],
+                          "type": "string"
+                        },
+                        "empty_placement": {
+                          "enum": [
+                            "start",
+                            "end"
+                          ],
+                          "type": "string"
+                        },
+                        "property": {
+                          "maxLength": 256,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "property"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 10,
+                    "type": "array"
+                  },
+                  "type": {
+                    "description": "a type key: only objects of this type",
+                    "maxLength": 256,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               }
             }
           },
@@ -6670,13 +9177,339 @@
         ]
       }
     },
+    "/v2/spaces/{space_id}/search/stream": {
+      "post": {
+        "description": "The body is the space search request without `query`; nothing pages. Opens with an object_added per matching object and snapshot_complete, then object_added, object_updated (a carried field or the discussion changed) and object_removed (left the set, not necessarily deleted). Events carry no id: a reconnect is a fresh snapshot.",
+        "operationId": "stream_space_search",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Keepalive cadence in seconds",
+            "in": "query",
+            "name": "heartbeat",
+            "schema": {
+              "default": 30,
+              "maximum": 60,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "not": {
+                  "properties": {
+                    "filter": {
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "filter",
+                    "filters"
+                  ]
+                },
+                "properties": {
+                  "fields": {
+                    "description": "property keys to include per row, as an array such as [\"status\",\"due_date\"]; the list reads take the same array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "filter": {
+                    "description": "compact filter string (grammar on kind filters), an alternative to the structured filters array; a body sends at most one of the two",
+                    "maxLength": 4096,
+                    "type": "string"
+                  },
+                  "filters": {
+                    "description": "structured filter nodes (schema kind filters), an alternative to the compact filter string; a body sends at most one of the two",
+                    "items": {
+                      "$ref": "#/components/schemas/FilterNode"
+                    },
+                    "maxItems": 50,
+                    "type": "array"
+                  },
+                  "query": {
+                    "description": "full-text query over object names and indexed content",
+                    "type": "string"
+                  },
+                  "sorts": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "direction": {
+                          "enum": [
+                            "asc",
+                            "desc"
+                          ],
+                          "type": "string"
+                        },
+                        "empty_placement": {
+                          "enum": [
+                            "start",
+                            "end"
+                          ],
+                          "type": "string"
+                        },
+                        "property": {
+                          "maxLength": 256,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "property"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 10,
+                    "type": "array"
+                  },
+                  "type": {
+                    "description": "a type key: only objects of this type",
+                    "maxLength": 256,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "description": "Search request",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Server-Sent Events stream"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Invalid request (validation_failed / ambiguous_input)"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found"
+          },
+          "429": {
+            "description": "Too many streams held at once; close one, retrying cannot succeed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Stream a space search",
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/v2/spaces/{space_id}/sharing": {
+      "delete": {
+        "description": "The invite stops working and the space is private again. Members already in the space stay.",
+        "operationId": "stop_sharing_space",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate without stopping",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Space is private"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Stop sharing a space",
+        "tags": [
+          "Sharing"
+        ]
+      },
+      "post": {
+        "description": "Makes a private space shareable so an invite can be minted. A space type that cannot be shared is a 409.",
+        "operationId": "share_space",
+        "parameters": [
+          {
+            "description": "Space id, from GET /v2/spaces",
+            "in": "path",
+            "name": "space_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate without sharing",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Space is shareable"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Share a space",
+        "tags": [
+          "Sharing"
+        ]
+      }
+    },
     "/v2/spaces/{space_id}/templates": {
       "get": {
         "description": "`type` narrows the list to the templates of one type. Each row's id is what a create passes in `template`, and `default` marks the one a create of that type starts from on its own.",
         "operationId": "list_templates",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -6764,7 +9597,7 @@
         "operationId": "create_template",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -6793,7 +9626,38 @@
           "content": {
             "application/json": {
               "schema": {
-                "description": "the template as an AnyBlock document: formatVersion 2.0, kind template, template_for naming the type; its schema and a worked example come from get_schema with kind template",
+                "additionalProperties": true,
+                "description": "the template as an AnyBlock document: kind template, template_for naming the type; its schema and a worked example come from GET /v2/schemas/template",
+                "properties": {
+                  "blocks": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "cover": {
+                    "type": "object"
+                  },
+                  "icon": {
+                    "type": "object"
+                  },
+                  "kind": {
+                    "const": "template"
+                  },
+                  "properties": {
+                    "type": "object"
+                  },
+                  "query_source": {
+                    "type": "object"
+                  },
+                  "template_for": {
+                    "description": "Templates only: the target type. In a bundle it is the derived id `type-<internal_key>`; a display name or the legacy `ot-<key>` is accepted on input.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "template_for"
+                ],
                 "type": "object"
               }
             }
@@ -6864,7 +9728,7 @@
         "operationId": "list_types",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -6933,11 +9797,11 @@
         ]
       },
       "post": {
-        "description": "A `property_definitions` entry naming a property that does not exist creates it alongside the type. The body is either the flat type body or an AnyBlock document with kind \"object_type\"; `formatVersion`, `kind` or `type_settings` picks the document form.",
+        "description": "A `property_definitions` entry naming a property that does not exist creates it alongside the type. The body is either the flat type body or an AnyBlock document with kind \"object_type\"; `kind` or `type_settings` picks the document form.",
         "operationId": "create_type",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -7178,7 +10042,25 @@
                     "type": "object"
                   },
                   {
-                    "description": "the type as an AnyBlock document: formatVersion 2.0, kind object_type, the definition under type_settings; its schema and a worked example come from get_schema with kind type_document",
+                    "additionalProperties": true,
+                    "description": "the type as an AnyBlock document: kind object_type, the definition under type_settings; its schema and a worked example come from GET /v2/schemas/type_document",
+                    "properties": {
+                      "cover": {
+                        "type": "object"
+                      },
+                      "icon": {
+                        "type": "object"
+                      },
+                      "kind": {
+                        "const": "object_type"
+                      },
+                      "properties": {
+                        "type": "object"
+                      },
+                      "type_settings": {
+                        "type": "object"
+                      }
+                    },
                     "type": "object"
                   }
                 ],
@@ -7252,7 +10134,7 @@
         "operationId": "delete_type",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -7261,7 +10143,7 @@
             }
           },
           {
-            "description": "Type key",
+            "description": "Type key, from GET /v2/spaces/{space_id}/types",
             "in": "path",
             "name": "type",
             "required": true,
@@ -7329,7 +10211,7 @@
         "operationId": "get_type",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -7338,7 +10220,7 @@
             }
           },
           {
-            "description": "Type key",
+            "description": "Type key, from GET /v2/spaces/{space_id}/types",
             "in": "path",
             "name": "type",
             "required": true,
@@ -7410,7 +10292,7 @@
             }
           },
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -7419,7 +10301,7 @@
             }
           },
           {
-            "description": "Type key",
+            "description": "Type key, from GET /v2/spaces/{space_id}/types",
             "in": "path",
             "name": "type",
             "required": true,
@@ -7876,7 +10758,7 @@
                     "additionalProperties": false,
                     "properties": {
                       "ops": {
-                        "description": "planned and refused whole before any write, then written in order: property ops first, view ops after, and a view op refused leaves the written property lists in place. Each op's members, schema and example come from get_op_schema with its op name",
+                        "description": "planned and refused whole before any write, then written in order: property ops first, view ops after, and a view op refused leaves the written property lists in place. Each op's members, schema and example come from GET /v2/schemas/ops/{op} with its op name",
                         "items": {
                           "properties": {
                             "op": {
@@ -7972,7 +10854,7 @@
         "operationId": "list_widgets",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -8060,7 +10942,7 @@
         "operationId": "create_widget",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -8251,7 +11133,7 @@
         "operationId": "delete_widget",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -8260,7 +11142,7 @@
             }
           },
           {
-            "description": "Widget id, or the id of the object the widget points at",
+            "description": "Widget id from GET /v2/spaces/{space_id}/widgets, or the id of the object the widget points at",
             "in": "path",
             "name": "widget_id",
             "required": true,
@@ -8352,7 +11234,7 @@
         "operationId": "update_widget",
         "parameters": [
           {
-            "description": "Space id",
+            "description": "Space id, from GET /v2/spaces",
             "in": "path",
             "name": "space_id",
             "required": true,
@@ -8361,7 +11243,7 @@
             }
           },
           {
-            "description": "Widget id, or the id of the object the widget points at",
+            "description": "Widget id from GET /v2/spaces/{space_id}/widgets, or the id of the object the widget points at",
             "in": "path",
             "name": "widget_id",
             "required": true,
@@ -8552,7 +11434,49 @@
           "content": {
             "application/json": {
               "schema": {
-                "description": "an AnyBlock document of any kind, checked without being stored; its schema and a worked example come from get_schema with kind document",
+                "additionalProperties": true,
+                "description": "an AnyBlock document of any kind, checked without being stored; its schema and a worked example come from GET /v2/schemas/document",
+                "properties": {
+                  "blocks": {
+                    "items": {
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "collection_items": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "cover": {
+                    "type": "object"
+                  },
+                  "icon": {
+                    "type": "object"
+                  },
+                  "option_ids": {
+                    "type": "object"
+                  },
+                  "properties": {
+                    "type": "object"
+                  },
+                  "property_internal_keys": {
+                    "type": "object"
+                  },
+                  "property_settings": {
+                    "type": "object"
+                  },
+                  "query_source": {
+                    "type": "object"
+                  },
+                  "type_settings": {
+                    "type": "object"
+                  },
+                  "uninstalled": {
+                    "const": true
+                  }
+                },
                 "type": "object"
               }
             }
@@ -8592,6 +11516,465 @@
         "summary": "Validate an AnyBlock document",
         "tags": [
           "Schemas"
+        ]
+      }
+    },
+    "/v2/workspace": {
+      "get": {
+        "description": "The account-level selection, which is the space the workspace-wide object-list routes act on.",
+        "operationId": "get_current_workspace",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentWorkspace"
+                }
+              }
+            },
+            "description": "The selected workspace id"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No workspace is selected"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Get the selected workspace",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/v2/workspace/backups/delete": {
+      "post": {
+        "description": "Removes a backup directory that could not be loaded, by path on the middleware host. Use GET /v2/spaces to see which spaces are live before deleting anything.",
+        "operationId": "delete_corrupted_backup",
+        "parameters": [
+          {
+            "description": "Validate the body without deleting",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteBackupRequest"
+              }
+            }
+          },
+          "description": "The backup directory to delete",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Backup deleted"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Delete a corrupted backup",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/v2/workspace/objects/remove": {
+      "post": {
+        "description": "Acts on the workspace from GET /v2/workspace, which must be granted to this key. The objects stay in their space; only the workspace's object list loses them.",
+        "operationId": "remove_objects_from_workspace",
+        "parameters": [
+          {
+            "description": "Validate the body without unlinking",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddObjectsRequest"
+              }
+            }
+          },
+          "description": "The object ids to unlink",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ObjectsMutationResponse"
+                }
+              }
+            },
+            "description": "The unlinked object ids"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "No workspace is selected"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Unlink objects from the selected workspace",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/v2/workspace/order": {
+      "put": {
+        "description": "Sets the order of the sidebar's space views for this account. The order is a list of space-view ids.",
+        "operationId": "set_space_order",
+        "parameters": [
+          {
+            "description": "Validate the body without committing",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpaceOrderRequest"
+              }
+            }
+          },
+          "description": "The space view and its new order",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpaceOrder"
+                }
+              }
+            },
+            "description": "The order after the change"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Reorder space views",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/v2/workspace/order/{space_view_id}": {
+      "delete": {
+        "description": "Removes one space view's custom order, falling back to the default.",
+        "operationId": "unset_space_order",
+        "parameters": [
+          {
+            "description": "Space view id",
+            "in": "path",
+            "name": "space_view_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Validate without clearing",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            },
+            "description": "Order cleared"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Clear a space view order",
+        "tags": [
+          "Spaces"
+        ]
+      }
+    },
+    "/v2/workspace/select": {
+      "post": {
+        "description": "Changes the account-wide selection that the workspace-wide object-list routes act on. The space must be live and granted to this key.",
+        "operationId": "select_workspace",
+        "parameters": [
+          {
+            "description": "Validate the body without selecting",
+            "in": "query",
+            "name": "dry_run",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Replay guard: the same key with the same body replays the stored response",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectWorkspaceRequest"
+              }
+            }
+          },
+          "description": "The space to select",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentWorkspace"
+                }
+              }
+            },
+            "description": "The selected workspace"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Validation failure"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Space not found or not live"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestTooLarge"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "security": [
+          {
+            "bearerauth": []
+          }
+        ],
+        "summary": "Select the workspace",
+        "tags": [
+          "Spaces"
         ]
       }
     },
@@ -8785,6 +12168,10 @@
     {
       "description": "Who is in a space, and which of them you are.",
       "name": "Members"
+    },
+    {
+      "description": "Invite links, membership changes, ownership and the space lifecycle.",
+      "name": "Sharing"
     },
     {
       "description": "Upload files and download file or icon content.",
