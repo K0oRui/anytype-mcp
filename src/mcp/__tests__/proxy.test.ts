@@ -258,6 +258,70 @@ describe("MCPProxy", () => {
       });
     });
 
+    describe("required arguments", () => {
+      const specWithRequiredParameter = () =>
+        createMockOpenApiSpec({
+          paths: {
+            "/v2/spaces/{space_id}/types/{type}/conflicts": {
+              get: {
+                operationId: "list_type_conflicts",
+                parameters: [
+                  { name: "space_id", in: "path", required: true, schema: { type: "string" } },
+                  { name: "type", in: "path", required: true, schema: { type: "string" } },
+                  { name: "limit", in: "query", required: false, schema: { type: "integer" } },
+                ],
+                responses: { "200": { description: "Success" } },
+              },
+            },
+          },
+        });
+
+      // the converter substitutes a parameter into the route by name: an
+      // omitted required one reaches the API as the literal string
+      // "undefined", and the refusal is then about a resource named
+      // "undefined" rather than about the argument the caller left out.
+      it("refuses a call that omits a required argument before it reaches the API", async () => {
+        const testProxy = new MCPProxy("test-proxy", specWithRequiredParameter());
+        const [, call] = getHandlers(testProxy);
+
+        const result = await call({ params: { name: "API-list-type-conflicts", arguments: { space_id: "s" } } });
+
+        expect(result.isError).toBe(true);
+        expect(JSON.parse(result.content[0].text)).toEqual({
+          code: "invalid_arguments",
+          message: "`type` is required",
+        });
+        expect(HttpClient.prototype.executeOperation).not.toHaveBeenCalled();
+      });
+
+      it("names every missing required argument", async () => {
+        const testProxy = new MCPProxy("test-proxy", specWithRequiredParameter());
+        const [, call] = getHandlers(testProxy);
+
+        const result = await call({ params: { name: "API-list-type-conflicts", arguments: {} } });
+
+        expect(JSON.parse(result.content[0].text)).toEqual({
+          code: "invalid_arguments",
+          message: "`space_id`, `type` are required",
+        });
+        expect(HttpClient.prototype.executeOperation).not.toHaveBeenCalled();
+      });
+
+      it("dispatches once the required arguments are present", async () => {
+        vi.mocked(HttpClient.prototype.executeOperation).mockResolvedValueOnce(mockSuccessResponse);
+        const testProxy = new MCPProxy("test-proxy", specWithRequiredParameter());
+        const [, call] = getHandlers(testProxy);
+
+        const result = await call({
+          params: { name: "API-list-type-conflicts", arguments: { space_id: "s", type: "plant" } },
+        });
+
+        expect(result.isError).toBeUndefined();
+        expect(JSON.parse(result.content[0].text)).toEqual({ message: "success" });
+        expect(HttpClient.prototype.executeOperation).toHaveBeenCalledTimes(1);
+      });
+    });
+
     it("preserves structured API failures and marks them as MCP errors", async () => {
       const data = {
         code: "validation_failed",

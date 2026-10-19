@@ -31,6 +31,11 @@ export class MCPProxy {
   private httpClient: HttpClient;
   private tools: Record<string, NewToolDefinition>;
   private openApiLookup: Record<string, OpenAPIV3.OperationObject & { method: string; path: string }>;
+  // advertised tool name → its required arguments. A required path argument
+  // left out by the caller is otherwise substituted into the route as the
+  // literal string "undefined", and the API answers a 404 about a resource
+  // named "undefined" instead of naming the argument that is missing.
+  private requiredArguments: Map<string, string[]>;
   // operationId → this server's tool, for re-spelling the server's typed
   // repair hints (see_also) in the tool vocabulary
   private operationIndex: OperationIndex;
@@ -46,6 +51,13 @@ export class MCPProxy {
     const { tools, openApiLookup } = converter.convertToMCPTools();
     this.tools = tools;
     this.openApiLookup = openApiLookup;
+    this.requiredArguments = new Map(
+      Object.entries(tools).flatMap(([toolName, def]) =>
+        def.methods
+          .filter((method) => method.inputSchema.required?.length)
+          .map((method) => [`${toolName}-${method.name}`, method.inputSchema.required!] as const),
+      ),
+    );
     this.toolsWithOutputSchema = new Set(
       Object.entries(tools).flatMap(([toolName, def]) =>
         def.methods
@@ -99,6 +111,24 @@ export class MCPProxy {
       const operation = this.findOperation(name);
       if (!operation) {
         throw new Error(`Method ${name} not found`);
+      }
+
+      const missing = (this.requiredArguments.get(name) ?? []).filter((argument) => params?.[argument] === undefined);
+      if (missing.length > 0) {
+        return {
+          isError: true,
+          content: [
+            {
+              type: "text",
+              text: JSON.stringify({
+                code: "invalid_arguments",
+                message: `${missing.map((argument) => `\`${argument}\``).join(", ")} ${
+                  missing.length === 1 ? "is" : "are"
+                } required`,
+              }),
+            },
+          ],
+        };
       }
 
       try {
