@@ -17,10 +17,10 @@ describe("fixed Anytype tool manifests", () => {
     // v2 tools carry each operation's description beside its summary (the
     // server bounds those to 400 characters), and both versions add curated
     // lines for routes the document leaves as a bare summary. v2 measured
-    // 86,347 characters with the object administration tools; the ceiling is
-    // deliberately a few per cent above, so the next batch has to raise it
-    // on purpose rather than grow into it unnoticed.
-    { version: "v2", spec: v2, count: 83, maxCharacters: 87000 },
+    // 91,200 characters with the property and type maintenance tools; the
+    // ceiling is deliberately above, so the next batch has to raise it on
+    // purpose rather than grow into it unnoticed.
+    { version: "v2", spec: v2, count: 89, maxCharacters: 92000 },
   ])("keeps the $version tool list compact and usable", ({ version, spec, count, maxCharacters }) => {
     const { tools, openApiLookup } = new OpenAPIToMCPConverter(spec as OpenAPIV3.Document).convertToMCPTools();
     const listed = tools.API.methods.map(({ name, description, inputSchema }) => ({
@@ -111,6 +111,27 @@ describe("fixed Anytype tool manifests", () => {
       expect(byName["API-set-object-icon"].inputSchema.properties).toHaveProperty("format");
       expect(byName["API-set-object-cover"].inputSchema.properties).toHaveProperty("format");
       expect(byName["API-set-object-items-order"].inputSchema.properties).toHaveProperty("ids");
+      // Property and type maintenance: the select-option verbs, the reverse
+      // property lookup, and the type conflict and ordering verbs. An option
+      // is addressed by its id or by its name, so the option routes take a
+      // path parameter rather than a body field.
+      for (const tool of [
+        "API-remove-property-option",
+        "API-set-property-options-order",
+        "API-list-properties-with-value",
+        "API-list-type-conflicts",
+        "API-resolve-type-conflicts",
+        "API-set-types-order",
+      ]) {
+        expect(byName).toHaveProperty(tool);
+      }
+      expect(byName["API-remove-property-option"].inputSchema.properties).toHaveProperty("option");
+      expect(byName["API-remove-property-option"].inputSchema.properties).toHaveProperty("delete_in_objects");
+      expect(byName["API-set-property-options-order"].inputSchema.properties).toHaveProperty("options");
+      expect(byName["API-list-properties-with-value"].inputSchema.properties).toHaveProperty("value");
+      expect(byName["API-list-type-conflicts"].inputSchema.properties).toHaveProperty("type");
+      expect(byName["API-resolve-type-conflicts"].inputSchema.properties).toHaveProperty("dry_run");
+      expect(byName["API-set-types-order"].inputSchema.properties).toHaveProperty("types");
     }
   });
 });
