@@ -16,7 +16,10 @@ describe("fixed Anytype tool manifests", () => {
     { version: "v1", spec: v1, count: 49, maxCharacters: 34000 },
     // v2 tools carry each operation's description beside its summary (the
     // server bounds those to 400 characters), and both versions add curated
-    // lines for routes the document leaves as a bare summary
+    // lines for routes the document leaves as a bare summary. v2 measured
+    // 86,347 characters with the object administration tools; the ceiling is
+    // deliberately a few per cent above, so the next batch has to raise it
+    // on purpose rather than grow into it unnoticed.
     { version: "v2", spec: v2, count: 83, maxCharacters: 87000 },
   ])("keeps the $version tool list compact and usable", ({ version, spec, count, maxCharacters }) => {
     const { tools, openApiLookup } = new OpenAPIToMCPConverter(spec as OpenAPIV3.Document).convertToMCPTools();
@@ -80,6 +83,34 @@ describe("fixed Anytype tool manifests", () => {
       expect(byName["API-join-space"].inputSchema.properties).toHaveProperty("invite_file_key");
       expect(byName["API-share-space"].inputSchema.properties).toHaveProperty("dry_run");
       expect(byName["API-change-space-ownership"].inputSchema.properties).toHaveProperty("new_owner_identity");
+      // Object administration: the whole-object verbs, the bulk writes and
+      // the two typed envelopes the older surface had no route for. The
+      // request DTO fields are inlined as tool properties, so the checks below
+      // read the members a caller sends.
+      for (const tool of [
+        "API-duplicate-object",
+        "API-set-objects-archived",
+        "API-set-objects-type",
+        "API-set-objects-properties",
+        "API-set-object-layout",
+        "API-convert-object",
+        "API-set-object-source",
+        "API-refresh-object",
+        "API-create-object-from-url",
+        "API-set-object-icon",
+        "API-set-object-cover",
+        "API-set-object-items-order",
+      ]) {
+        expect(byName).toHaveProperty(tool);
+      }
+      expect(byName["API-set-objects-archived"].inputSchema.properties).toHaveProperty("archived");
+      expect(byName["API-set-objects-properties"].inputSchema.properties).toHaveProperty("set");
+      expect(byName["API-convert-object"].inputSchema.properties).toHaveProperty("to");
+      expect(byName["API-convert-object"].inputSchema.properties).toHaveProperty("source");
+      expect(byName["API-create-object-from-url"].inputSchema.properties).toHaveProperty("url");
+      expect(byName["API-set-object-icon"].inputSchema.properties).toHaveProperty("format");
+      expect(byName["API-set-object-cover"].inputSchema.properties).toHaveProperty("format");
+      expect(byName["API-set-object-items-order"].inputSchema.properties).toHaveProperty("ids");
     }
   });
 });

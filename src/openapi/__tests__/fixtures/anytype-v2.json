@@ -1269,7 +1269,7 @@
       "ObjectCoverRequest": {
         "properties": {
           "color": {
-            "description": "Color is a flat colour, for format=color.",
+            "description": "Color is a flat colour name, for format=color. The store keeps the name\nas the app's picker spells it.",
             "type": "string"
           },
           "file": {
@@ -1300,7 +1300,7 @@
       "ObjectIconRequest": {
         "properties": {
           "color": {
-            "description": "Color tints the icon, or is the icon itself for format=color.",
+            "description": "Color tints the icon, or is the icon itself for format=color. It is a\npalette name: grey, yellow, orange, red, pink, purple, blue, ice, teal\nor lime, the same ten the app's picker offers.",
             "type": "string"
           },
           "emoji": {
@@ -8364,7 +8364,7 @@
     },
     "/v2/spaces/{space_id}/objects/{object_id}/icon": {
       "put": {
-        "description": "The icon is one of four variants chosen by format: an emoji, an image object in this space, a built-in icon name, or a flat colour. A colour tints the first three.",
+        "description": "The icon is one of four variants chosen by format: an emoji, an image object in this space, a built-in icon name, or a flat colour. A colour tints the first three; it is a palette name (grey, yellow, orange, red, pink, purple, blue, ice, teal or lime).",
         "operationId": "set_object_icon",
         "parameters": [
           {
